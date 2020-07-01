@@ -1,6 +1,10 @@
 package org.dice_research.opal.batch.processor;
 
-import org.apache.jena.rdf.model.Model;
+import java.util.List;
+
+import org.dice_research.opal.batch.configuration.Cfg;
+import org.dice_research.opal.batch.configuration.CfgKeys;
+import org.dice_research.opal.common.interfaces.ModelProcessor;
 import org.dice_research.opal.metadata.GeoData;
 
 /**
@@ -10,20 +14,16 @@ import org.dice_research.opal.metadata.GeoData;
  *
  * @author Adrian Wilke
  */
-public class GeoDataProcessor {
+public class GeoDataProcessor extends AbstractProcessor {
 
-	private GeoData geoData = null;
-
-	private void initialize() throws Exception {
-		geoData = new GeoData();
+	@Override
+	public boolean addModelProcessor(Cfg cfg, List<ModelProcessor> processors) {
+		return super.addModelProcessor(cfg, processors, CfgKeys.RUN_GEO);
 	}
 
-	public void process(Model model, String datasetUri) throws Exception {
-		if (geoData == null) {
-			initialize();
-		}
-
-		geoData.processModel(model, datasetUri);
+	@Override
+	public ModelProcessor createModelProcessor(Cfg cfg) {
+		return new GeoData();
 	}
 
 }

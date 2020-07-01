@@ -1,47 +1,38 @@
 package org.dice_research.opal.batch.processor;
 
-import org.apache.jena.rdf.model.Model;
+import java.util.List;
+
+import org.dice_research.opal.batch.configuration.Cfg;
+import org.dice_research.opal.batch.configuration.CfgKeys;
 import org.dice_research.opal.civet.Civet;
+import org.dice_research.opal.common.interfaces.ModelProcessor;
 
 /**
  * Civet.
- * 
- * Usage: Use public variables for configuration.
  * 
  * @see https://github.com/projekt-opal/civet
  *
  * @author Adrian Wilke
  */
-public class CivetProcessor {
+public class CivetProcessor extends AbstractProcessor {
 
-	private Civet civet = null;
+	public boolean addModelProcessor(Cfg cfg, List<ModelProcessor> processors) {
+		return super.addModelProcessor(cfg, processors, CfgKeys.RUN_CIVET);
+	}
 
-	public boolean includeLongRunning = false;
-	public boolean logIfNotComputed = true;
-	public boolean removeMeasurements = true;
-
-	private void initialize() {
-		civet = new Civet()
+	public Civet createModelProcessor(Cfg cfg) {
+		return new Civet()
 
 				// If long running metrics should be included.
 				// (optional method call, default: false)
-				.setIncludeLongRunning(includeLongRunning)
+				.setIncludeLongRunning(cfg.getBoolean(CfgKeys.CIVET_LONG_RUN))
 
 				// If it should be logged, if a measurement could not be computed
 				// (optional method call, default: true)
-				.setLogIfNotComputed(logIfNotComputed)
+				.setLogIfNotComputed(cfg.getBoolean(CfgKeys.CIVET_LOG))
 
 				// If existing measurements should be removed
 				// (optional method call, default: true)
-				.setRemoveMeasurements(removeMeasurements);
+				.setRemoveMeasurements(cfg.getBoolean(CfgKeys.CIVET_REMOVE_MEASUREMENTS));
 	}
-
-	public void process(Model model, String datasetUri) throws Exception {
-		if (civet == null) {
-			initialize();
-		}
-
-		civet.processModel(model, datasetUri);
-	}
-
 }

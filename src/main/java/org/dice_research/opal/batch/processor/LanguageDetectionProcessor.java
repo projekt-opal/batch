@@ -1,6 +1,10 @@
 package org.dice_research.opal.batch.processor;
 
-import org.apache.jena.rdf.model.Model;
+import java.util.List;
+
+import org.dice_research.opal.batch.configuration.Cfg;
+import org.dice_research.opal.batch.configuration.CfgKeys;
+import org.dice_research.opal.common.interfaces.ModelProcessor;
 import org.dice_research.opal.metadata.LanguageDetection;
 
 /**
@@ -10,21 +14,22 @@ import org.dice_research.opal.metadata.LanguageDetection;
  *
  * @author Adrian Wilke
  */
-public class LanguageDetectionProcessor {
+public class LanguageDetectionProcessor extends AbstractProcessor {
 
-	private LanguageDetection languageDetection = null;
-
-	private void initialize() throws Exception {
-		languageDetection = new LanguageDetection();
-		languageDetection.initialize();
+	@Override
+	public boolean addModelProcessor(Cfg cfg, List<ModelProcessor> processors) {
+		return super.addModelProcessor(cfg, processors, CfgKeys.RUN_LANG);
 	}
 
-	public void process(Model model, String datasetUri) throws Exception {
-		if (languageDetection == null) {
-			initialize();
+	@Override
+	public ModelProcessor createModelProcessor(Cfg cfg) {
+		LanguageDetection languageDetection = new LanguageDetection();
+		try {
+			languageDetection.initialize();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
-
-		languageDetection.processModel(model, datasetUri);
+		return languageDetection;
 	}
 
 }

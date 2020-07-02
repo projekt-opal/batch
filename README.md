@@ -40,6 +40,15 @@ io.output = dcat-out.ttl
 Finally, use the [Batch](src/main/java/org/dice_research/opal/batch/Batch.java) class to process the DCAT data.
 
 
+## Data to process
+
+Data should be in a [RDF serialization format](https://en.wikipedia.org/wiki/Resource_Description_Framework#Serialization_formats)
+and using the [Data Catalog Vocabulary (DCAT)](https://www.w3.org/TR/vocab-dcat-2/) vocabulary.
+
+You can find ready-to go input data at the Hobbitdata Server.
+Crawled data is available in the directories [OPAL/processed_datasets](https://hobbitdata.informatik.uni-leipzig.de/OPAL/processed_datasets/) and [OPAL/SourceGraphs](https://hobbitdata.informatik.uni-leipzig.de/OPAL/SourceGraphs/).
+
+
 ## Credits
 
 [Data Science Group (DICE)](https://dice-research.org/) at [Paderborn University](https://www.uni-paderborn.de/)

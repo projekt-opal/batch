@@ -1,4 +1,4 @@
-package batch;
+package misc;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,6 +15,7 @@ import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 /**
@@ -33,6 +34,9 @@ public class QuadsIoTest {
 	 */
 	@Test
 	public void testReadNquads() throws IOException {
+
+		// Does not test functionality
+		Assume.assumeTrue("Development test (Jena Framework)", false);
 
 		// Create model
 		Model model = ModelFactory.createDefaultModel();

@@ -35,36 +35,41 @@ public class Batch {
 	 * Main entry point.
 	 */
 	public static void main(String[] args) throws Exception {
-		long time = System.currentTimeMillis();
 
 		// Set default or custom configuration
-		Cfg cfg = null;
 		if (args.length == 0) {
-			cfg = new Cfg();
+			new Batch().execute(new Cfg());
 		} else {
-			cfg = new Cfg(new File(args[0]));
+			new Batch().execute(new Cfg(new File(args[0])));
 		}
+	}
+
+	private List<ModelProcessor> modelProcessors;
+
+	public void execute(Cfg cfg) throws Exception {
+		execute(cfg, new Processors().createModelProcessors(cfg));
+	}
+
+	public void execute(Cfg cfg, Processors processors) throws Exception {
+		long time = System.currentTimeMillis();
+
+		// Configure components
+		this.modelProcessors = processors.getModelProcessors();
 
 		// Configure I/O
 		File inputFile = new File(cfg.get(CfgKeys.IO_INPUT));
 		File outputFile = new File(cfg.get(CfgKeys.IO_OUTPUT));
 		String inputGraph = cfg.get(CfgKeys.IO_INPUT_GRAPH);
 
-		// Configure components
-		Batch batch = new Batch();
-		batch.modelProcessors = new Processors().createModelProcessors(cfg).getModelProcessors();
-
 		// Process data
 		if (inputFile.isFile()) {
-			batch.processFile(inputFile, inputGraph, outputFile, Lang.TURTLE);
+			processFile(inputFile, inputGraph, outputFile, Lang.TURTLE);
 		} else {
-			batch.processDirectory(inputFile, inputGraph, outputFile, Lang.TURTLE);
+			processDirectory(inputFile, inputGraph, outputFile, Lang.TURTLE);
 		}
 
 		LOGGER.info("Run time (secs): " + 1f * (System.currentTimeMillis() - time) / 1000);
 	}
-
-	private List<ModelProcessor> modelProcessors;
 
 	private void processDirectory(File inputDirectory, String inputGraphName, File outputDirectory, Lang outputLang) {
 		if (!inputDirectory.canRead()) {

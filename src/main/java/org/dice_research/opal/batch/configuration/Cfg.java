@@ -3,6 +3,9 @@ package org.dice_research.opal.batch.configuration;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.logging.log4j.LogManager;
@@ -43,7 +46,24 @@ public class Cfg {
 		return Boolean.parseBoolean(properties.getProperty(key));
 	}
 
+	public List<String> getKeys(String prefix) {
+		List<String> keys = new LinkedList<>();
+		Enumeration<?> propertyNames = properties.propertyNames();
+		while (propertyNames.hasMoreElements()) {
+			String propertyName = propertyNames.nextElement().toString();
+			if (propertyName.startsWith(prefix)) {
+				keys.add(propertyName);
+			}
+		}
+		return keys;
+	}
+
 	public boolean has(String key) {
 		return properties.containsKey(key);
+	}
+
+	public Cfg set(String key, String value) {
+		properties.setProperty(key, value);
+		return this;
 	}
 }

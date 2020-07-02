@@ -1,15 +1,20 @@
 package org.dice_research.opal.batch;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFLanguages;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.dice_research.opal.batch.configuration.Cfg;
 import org.dice_research.opal.batch.configuration.CfgKeys;
 import org.dice_research.opal.batch.processor.Processors;
 import org.dice_research.opal.batch.reader.RdfFileReader;
-import org.dice_research.opal.batch.reader.RdfReader;
 import org.dice_research.opal.batch.reader.RdfReaderResult;
 import org.dice_research.opal.batch.writer.RdfFileWriter;
 import org.dice_research.opal.batch.writer.RdfWriter;
@@ -17,10 +22,14 @@ import org.dice_research.opal.common.interfaces.ModelProcessor;
 
 /**
  * Batch processing of OPAL components.
+ * 
+ * Usage: Specify a properties configuration file and pass it as argument.
  *
  * @author Adrian Wilke
  */
 public class Batch {
+
+	private static final Logger LOGGER = LogManager.getLogger();
 
 	/**
 	 * Main entry point.
@@ -37,43 +46,77 @@ public class Batch {
 		}
 
 		// Configure I/O
-		File inputFile = new File(cfg.get(CfgKeys.IO_INPUT_FILE));
-		File outputFile = new File(cfg.get(CfgKeys.IO_OUTPUT_FILE));
+		File inputFile = new File(cfg.get(CfgKeys.IO_INPUT));
+		File outputFile = new File(cfg.get(CfgKeys.IO_OUTPUT));
 		String inputGraph = cfg.get(CfgKeys.IO_INPUT_GRAPH);
 
 		// Configure components
 		Batch batch = new Batch();
-		batch.modelProcessors = Processors.createModelProcessors(cfg);
+		batch.modelProcessors = new Processors().createModelProcessors(cfg).getModelProcessors();
 
 		// Process data
-		if (inputGraph != null && !inputGraph.isEmpty()) {
-			batch.processNquadsFile(inputFile, inputGraph, outputFile, Lang.TURTLE);
+		if (inputFile.isFile()) {
+			batch.processFile(inputFile, inputGraph, outputFile, Lang.TURTLE);
 		} else {
-			batch.processFile(inputFile, outputFile, Lang.TURTLE);
+			batch.processDirectory(inputFile, inputGraph, outputFile, Lang.TURTLE);
 		}
 
-		System.out.println(1f * (System.currentTimeMillis() - time) / 1000);
+		LOGGER.info("Run time (secs): " + 1f * (System.currentTimeMillis() - time) / 1000);
 	}
 
 	private List<ModelProcessor> modelProcessors;
 
-	private void processFile(File inputFile, File outputFile, Lang outputLang) throws Exception {
-		RdfReader rdfReader = new RdfFileReader().setFile(inputFile);
-		RdfWriter rdfWriter = new RdfFileWriter().setFile(outputFile).setLang(outputLang);
-		while (rdfReader.hasNext()) {
-			RdfReaderResult result = rdfReader.next();
-			processModel(result.getModel(), result.getDatasetUri());
-			rdfWriter.write(result.getModel());
+	private void processDirectory(File inputDirectory, String inputGraphName, File outputDirectory, Lang outputLang) {
+		if (!inputDirectory.canRead()) {
+			throw new RuntimeException("Can not read: " + inputDirectory.getAbsolutePath());
 		}
-		rdfWriter.finish();
+
+		// Get files
+		Set<String> fileExtensions = getFileExtensions();
+		File[] inputFiles = inputDirectory.listFiles(new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				String ext = name.substring(name.lastIndexOf(".") + 1);
+				if (fileExtensions.contains(ext)) {
+					return true;
+				} else {
+					LOGGER.info("Skipping unknown file extension " + name);
+					return false;
+				}
+			}
+		});
+
+		// Process
+		LOGGER.info("Processing " + inputFiles.length + " files in " + outputDirectory.getAbsolutePath());
+		for (File inputFile : inputFiles) {
+			File outputFile = new File(outputDirectory, inputFile.getName());
+			try {
+				processFile(inputFile, inputGraphName, outputFile, outputLang);
+			} catch (Exception e) {
+				LOGGER.error("Error in processing " + inputFile.getAbsolutePath(), e);
+			}
+		}
 	}
 
-	private void processNquadsFile(File inputFile, String inputGraphName, File outputFile, Lang outputLang)
-			throws Exception {
-		RdfReader rdfReader = new RdfFileReader().setFile(inputFile).setGraphName(inputGraphName);
+	private Set<String> getFileExtensions() {
+		Set<String> fileExtensions = new TreeSet<>();
+		for (Lang lang : RDFLanguages.getRegisteredLanguages()) {
+			fileExtensions.addAll(lang.getFileExtensions());
+		}
+		return fileExtensions;
+	}
+
+	private void processFile(File inputFile, String inputGraphName, File outputFile, Lang outputLang) throws Exception {
+
+		RdfFileReader rdfFileReader = new RdfFileReader().setFile(inputFile);
+		if (inputGraphName != null && !inputGraphName.isEmpty()) {
+			rdfFileReader.setGraphName(inputGraphName);
+		}
+
 		RdfWriter rdfWriter = new RdfFileWriter().setFile(outputFile).setLang(outputLang);
-		while (rdfReader.hasNext()) {
-			RdfReaderResult result = rdfReader.next();
+
+		while (rdfFileReader.hasNext()) {
+			RdfReaderResult result = rdfFileReader.next();
 			processModel(result.getModel(), result.getDatasetUri());
 			rdfWriter.write(result.getModel());
 		}

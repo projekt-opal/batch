@@ -7,21 +7,31 @@ import org.dice_research.opal.batch.configuration.Cfg;
 import org.dice_research.opal.common.interfaces.ModelProcessor;
 
 /**
- * Handles all processors.
+ * Handles processors.
  *
  * @author Adrian Wilke
  */
-public abstract class Processors {
+public class Processors {
+
+	private List<ModelProcessor> modelProcessors = new LinkedList<>();
 
 	/**
 	 * Creates a list of new model processor objects.
 	 */
-	public static List<ModelProcessor> createModelProcessors(Cfg cfg) {
-		List<ModelProcessor> modelProcessors = new LinkedList<>();
+	public Processors createModelProcessors(Cfg cfg) {
 		new CatfishProcessor().addModelProcessor(cfg, modelProcessors);
 		new LanguageDetectionProcessor().addModelProcessor(cfg, modelProcessors);
 		new GeoDataProcessor().addModelProcessor(cfg, modelProcessors);
 		new CivetProcessor().addModelProcessor(cfg, modelProcessors);
+		return this;
+	}
+
+	public Processors addModelProcessor(ModelProcessor modelProcessor) {
+		modelProcessors.add(modelProcessor);
+		return this;
+	}
+
+	public List<ModelProcessor> getModelProcessors() {
 		return modelProcessors;
 	}
 

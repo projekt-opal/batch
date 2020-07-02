@@ -12,6 +12,8 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.vocabulary.DCAT;
 import org.apache.jena.vocabulary.RDF;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Simple RDF file reader.
@@ -26,6 +28,8 @@ import org.apache.jena.vocabulary.RDF;
  * @author Adrian Wilke
  */
 public class RdfFileReader implements RdfReader {
+
+	private static final Logger LOGGER = LogManager.getLogger();
 
 	private File file = null;
 	private String graphName = null;
@@ -96,10 +100,12 @@ public class RdfFileReader implements RdfReader {
 	}
 
 	private static Model loadFile(File file) {
+		LOGGER.info("Reading: " + file.getAbsolutePath() + " " + file.length() / 1000000 + " MB");
 		return RDFDataMgr.loadModel(file.toURI().toString());
 	}
 
 	private static Model loadNquadsGraph(File nquadsFile, String graphName) {
+		LOGGER.info("Reading: " + nquadsFile.getAbsolutePath() + " " + nquadsFile.length() / 1000000 + " MB");
 		return RDFDataMgr.loadDataset(nquadsFile.toURI().toString(), Lang.NQUADS).getNamedModel(graphName);
 	}
 }

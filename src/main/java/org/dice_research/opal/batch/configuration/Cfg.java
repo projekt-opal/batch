@@ -5,12 +5,17 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * Configuration based on property files.
  *
  * @author Adrian Wilke
  */
 public class Cfg {
+
+	private static final Logger LOGGER = LogManager.getLogger();
 
 	private static final String DEFAULT_CONFIGURATION_FILE = "default.properties";
 	private Properties properties;
@@ -20,6 +25,8 @@ public class Cfg {
 	}
 
 	public Cfg(File file) {
+		LOGGER.info("Configuration: " + file.getAbsolutePath());
+
 		properties = new Properties();
 		try {
 			properties.load(new FileReader(file));

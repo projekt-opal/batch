@@ -8,8 +8,12 @@ import java.io.IOException;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class RdfFileWriter implements RdfWriter {
+
+	private static final Logger LOGGER = LogManager.getLogger();
 
 	private File file = null;
 	private Lang lang = null;
@@ -47,12 +51,18 @@ public class RdfFileWriter implements RdfWriter {
 	private void initialize() {
 		if (file == null) {
 			throw new RuntimeException("No file specified");
+			
 		} else if (!file.exists()) {
+			if (!file.getParentFile().exists()) {
+				file.getParentFile().mkdirs();
+			}
+			
 			try {
 				file.createNewFile();
 			} catch (IOException e) {
 				throw new RuntimeException("Could not create: " + file.getAbsolutePath());
 			}
+			
 		} else if (!file.canWrite()) {
 			throw new RuntimeException("Can not write: " + file.getAbsolutePath());
 		}
@@ -71,6 +81,7 @@ public class RdfFileWriter implements RdfWriter {
 
 	@Override
 	public RdfWriter finish() {
+		LOGGER.info("Wrote: " + file.getAbsolutePath() + " " + file.length() / 1000000 + " MB");
 		try {
 			fileOutputStream.close();
 		} catch (IOException e) {

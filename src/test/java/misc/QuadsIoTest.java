@@ -27,6 +27,8 @@ import org.junit.Test;
  * @author Adrian Wilke
  */
 public class QuadsIoTest {
+	
+	private static final boolean SKIP_TEST = true;
 
 	/**
 	 * {@link RDFDataMgr} provides load and read methods for Graph, Model, Dataset,
@@ -36,7 +38,7 @@ public class QuadsIoTest {
 	public void testReadNquads() throws IOException {
 
 		// Does not test functionality
-		Assume.assumeTrue("Development test (Jena Framework)", false);
+		Assume.assumeFalse("Development test (Jena Framework)", SKIP_TEST);
 
 		// Create model
 		Model model = ModelFactory.createDefaultModel();

@@ -1,0 +1,177 @@
+<https://www.admin.ch/opc/de/classified-compilation/19920252/index.html>
+        <http://www.w3.org/2000/01/rdf-schema#label>
+                "legal_basis" .
+
+<https://europeandataportal.eu/set/data/9927928-bundesamt-fur-statistik-bfs>
+        a       <http://www.w3.org/ns/dcat#Dataset> ;
+        <http://purl.org/dc/terms/description>
+                ""@en , "Im Rahmen der Medizinischen Statistik werden sämtliche stationären Spitalaufenthalte erfasst. Die Erhebung, die in allen Krankenhäusern und Kliniken durchgeführt wird, umfasst neben administrativen Daten und soziodemografischen Merkmalen der Patientinnen und Patienten auch die Diagnosen und Behandlungen. Um diese Informationen zu erfassen, werden zwei medizinische Klassifikationen verwendet. Es handelt sich dabei um die ICD-10-GM für die Diagnosen und die Schweizerische Operationsklassifikation (CHOP) für die Behandlungen. Die Kodierung der Diagnosen und Behandlungen unterliegt präzisen Richtlinien. Der Bereich Medizinische Klassifikationen des Bundesamtes für Statistik (BFS) redigiert, überprüft und passt diese Regeln allenfalls an, pflegt die obengenannten Klassifikationen und unterstützt alle, die sich mit der Kodierung befassen. Das Kodierungshandbuch beinhaltet alle Kodierrichtlinien, die bis zu seiner Genehmigung veröffentlicht wurden. Das Kodierungshandbuch ist die Grundlage für die Kodierung."@de ;
+        <http://purl.org/dc/terms/identifier>
+                "9927928@bundesamt-fur-statistik-bfs" ;
+        <http://purl.org/dc/terms/issued>
+                "2019-09-30T02:00:00"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
+        <http://purl.org/dc/terms/language>
+                "it" , "fr" , "de" ;
+        <http://purl.org/dc/terms/modified>
+                "2019-12-01T21:18:44.915475"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
+        <http://purl.org/dc/terms/publisher>
+                [ <http://www.w3.org/2000/01/rdf-schema#label>
+                          "BFS/OFS" ] ;
+        <http://purl.org/dc/terms/relation>
+                <https://www.admin.ch/opc/de/classified-compilation/19920252/index.html> ;
+        <http://purl.org/dc/terms/spatial>
+                "Schweiz" ;
+        <http://purl.org/dc/terms/temporal>
+                [ a                              <http://purl.org/dc/terms/PeriodOfTime> ;
+                  <http://schema.org/endDate>    "2020-12-31T01:00:00"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
+                  <http://schema.org/startDate>  "2020-01-01T01:00:00"^^<http://www.w3.org/2001/XMLSchema#dateTime>
+                ] ;
+        <http://purl.org/dc/terms/title>
+                ""@en , "Medizinisches Kodierungshandbuch. Der offizielle Leitfaden der Kodierrichtlinien in der Schweiz"@de ;
+        <http://www.w3.org/ns/dcat#contactPoint>
+                [ a       <http://www.w3.org/2006/vcard/ns#Organization> ;
+                  <http://www.w3.org/2006/vcard/ns#fn>
+                          "info@bfs.admin.ch" ;
+                  <http://www.w3.org/2006/vcard/ns#hasEmail>
+                          <https://opendata.swiss/auskunftsdienst@bfs.admin.ch>
+                ] ;
+        <http://www.w3.org/ns/dcat#distribution>
+                <https://europeandataportal.eu/set/distribution/779cb1ac-954a-4d74-bf70-f1bda4c0bbb2> , <https://europeandataportal.eu/set/distribution/0fd477fb-db70-438d-a204-b4e1a0e77157> , <https://europeandataportal.eu/set/distribution/7add9c7c-5249-4100-a6ee-1784c9c29c18> , <https://europeandataportal.eu/set/distribution/d69bbc85-2347-412c-b168-a9fc89eb46cb> , <https://europeandataportal.eu/set/distribution/5bc5753f-15e4-4170-baba-d1aadcb1cd6c> , <https://europeandataportal.eu/set/distribution/6d207aac-48c0-491e-9362-bf295990d030> ;
+        <http://www.w3.org/ns/dcat#keyword>
+                "publication"@en , "statistical-basis-and-overviews"@en , "health"@en , "grundlagen-und-ubersichten"@de , "gesundheit"@de , "publikation"@de ;
+        <http://www.w3.org/ns/dcat#landingPage>
+                "https://www.bfs.admin.ch/bfs/de/home/statistiken.html" ;
+        <http://www.w3.org/ns/dcat#theme>
+                <http://opendata.swiss/themes/statistical-basis> , <http://opendata.swiss/themes/health> .
+
+<https://europeandataportal.eu/set/distribution/0fd477fb-db70-438d-a204-b4e1a0e77157>
+        a       <http://www.w3.org/ns/dcat#Distribution> ;
+        <http://purl.org/dc/terms/description>
+                ""@en , ""@de ;
+        <http://purl.org/dc/terms/format>
+                "PDF" ;
+        <http://purl.org/dc/terms/identifier>
+                "9927931-master@bundesamt-fur-statistik-bfs" ;
+        <http://purl.org/dc/terms/issued>
+                "2019-09-30T02:00:00"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
+        <http://purl.org/dc/terms/language>
+                "it" ;
+        <http://purl.org/dc/terms/rights>
+                "NonCommercialAllowed-CommercialWithPermission-ReferenceRequired" ;
+        <http://purl.org/dc/terms/title>
+                ""@en , ""@de ;
+        <http://www.w3.org/ns/dcat#accessURL>
+                <https://www.bfs.admin.ch/bfsstatic/dam/assets/9927931/master> ;
+        <http://www.w3.org/ns/dcat#downloadURL>
+                <https://www.bfs.admin.ch/bfsstatic/dam/assets/9927931/master> ;
+        <http://www.w3.org/ns/dcat#mediaType>
+                "application/pdf" .
+
+<https://europeandataportal.eu/set/distribution/6d207aac-48c0-491e-9362-bf295990d030>
+        a       <http://www.w3.org/ns/dcat#Distribution> ;
+        <http://purl.org/dc/terms/description>
+                ""@de , ""@en ;
+        <http://purl.org/dc/terms/format>
+                "HTML" ;
+        <http://purl.org/dc/terms/identifier>
+                "9927930-fr@bundesamt-fur-statistik-bfs" ;
+        <http://purl.org/dc/terms/issued>
+                "2019-09-30T02:00:00"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
+        <http://purl.org/dc/terms/language>
+                "fr" ;
+        <http://purl.org/dc/terms/rights>
+                "NonCommercialAllowed-CommercialWithPermission-ReferenceRequired" ;
+        <http://purl.org/dc/terms/title>
+                ""@en , ""@de ;
+        <http://www.w3.org/ns/dcat#accessURL>
+                <https://www.bfs.admin.ch/asset/fr/544-2000> ;
+        <http://www.w3.org/ns/dcat#mediaType>
+                "text/html" .
+
+<https://europeandataportal.eu/set/distribution/d69bbc85-2347-412c-b168-a9fc89eb46cb>
+        a       <http://www.w3.org/ns/dcat#Distribution> ;
+        <http://purl.org/dc/terms/description>
+                ""@en , ""@de ;
+        <http://purl.org/dc/terms/format>
+                "HTML" ;
+        <http://purl.org/dc/terms/identifier>
+                "9927931-it@bundesamt-fur-statistik-bfs" ;
+        <http://purl.org/dc/terms/issued>
+                "2019-09-30T02:00:00"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
+        <http://purl.org/dc/terms/language>
+                "it" ;
+        <http://purl.org/dc/terms/rights>
+                "NonCommercialAllowed-CommercialWithPermission-ReferenceRequired" ;
+        <http://purl.org/dc/terms/title>
+                ""@en , ""@de ;
+        <http://www.w3.org/ns/dcat#accessURL>
+                <https://www.bfs.admin.ch/asset/it/545-2000> ;
+        <http://www.w3.org/ns/dcat#mediaType>
+                "text/html" .
+
+<https://europeandataportal.eu/set/distribution/779cb1ac-954a-4d74-bf70-f1bda4c0bbb2>
+        a       <http://www.w3.org/ns/dcat#Distribution> ;
+        <http://purl.org/dc/terms/description>
+                ""@en , "Im Rahmen der Medizinischen Statistik werden sämtliche stationären Spitalaufenthalte erfasst. Die Erhebung, die in allen Krankenhäusern und Kliniken durchgeführt wird, umfasst neben administrativen Daten und soziodemografischen Merkmalen der Patientinnen und Patienten auch die Diagnosen und Behandlungen. Um diese Informationen zu erfassen, werden zwei medizinische Klassifikationen verwendet. Es handelt sich dabei um die ICD-10-GM für die Diagnosen und die Schweizerische Operationsklassifikation (CHOP) für die Behandlungen. Die Kodierung der Diagnosen und Behandlungen unterliegt präzisen Richtlinien. Der Bereich Medizinische Klassifikationen des Bundesamtes für Statistik (BFS) redigiert, überprüft und passt diese Regeln allenfalls an, pflegt die obengenannten Klassifikationen und unterstützt alle, die sich mit der Kodierung befassen. Das Kodierungshandbuch beinhaltet alle Kodierrichtlinien, die bis zu seiner Genehmigung veröffentlicht wurden. Das Kodierungshandbuch ist die Grundlage für die Kodierung."@de ;
+        <http://purl.org/dc/terms/format>
+                "PDF" ;
+        <http://purl.org/dc/terms/identifier>
+                "9927929-master@bundesamt-fur-statistik-bfs" ;
+        <http://purl.org/dc/terms/issued>
+                "2019-09-30T02:00:00"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
+        <http://purl.org/dc/terms/language>
+                "de" ;
+        <http://purl.org/dc/terms/rights>
+                "NonCommercialAllowed-CommercialWithPermission-ReferenceRequired" ;
+        <http://purl.org/dc/terms/title>
+                ""@en , "Medizinisches Kodierungshandbuch. Der offizielle Leitfaden der Kodierrichtlinien in der Schweiz"@de ;
+        <http://www.w3.org/ns/dcat#accessURL>
+                <https://www.bfs.admin.ch/bfsstatic/dam/assets/9927929/master> ;
+        <http://www.w3.org/ns/dcat#downloadURL>
+                <https://www.bfs.admin.ch/bfsstatic/dam/assets/9927929/master> ;
+        <http://www.w3.org/ns/dcat#mediaType>
+                "application/pdf" .
+
+<https://europeandataportal.eu/set/distribution/7add9c7c-5249-4100-a6ee-1784c9c29c18>
+        a       <http://www.w3.org/ns/dcat#Distribution> ;
+        <http://purl.org/dc/terms/description>
+                ""@en , ""@de ;
+        <http://purl.org/dc/terms/format>
+                "PDF" ;
+        <http://purl.org/dc/terms/identifier>
+                "9927930-master@bundesamt-fur-statistik-bfs" ;
+        <http://purl.org/dc/terms/issued>
+                "2019-09-30T02:00:00"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
+        <http://purl.org/dc/terms/language>
+                "fr" ;
+        <http://purl.org/dc/terms/rights>
+                "NonCommercialAllowed-CommercialWithPermission-ReferenceRequired" ;
+        <http://purl.org/dc/terms/title>
+                ""@en , ""@de ;
+        <http://www.w3.org/ns/dcat#accessURL>
+                <https://www.bfs.admin.ch/bfsstatic/dam/assets/9927930/master> ;
+        <http://www.w3.org/ns/dcat#downloadURL>
+                <https://www.bfs.admin.ch/bfsstatic/dam/assets/9927930/master> ;
+        <http://www.w3.org/ns/dcat#mediaType>
+                "application/pdf" .
+
+<https://europeandataportal.eu/set/distribution/5bc5753f-15e4-4170-baba-d1aadcb1cd6c>
+        a       <http://www.w3.org/ns/dcat#Distribution> ;
+        <http://purl.org/dc/terms/description>
+                ""@en , "Im Rahmen der Medizinischen Statistik werden sämtliche stationären Spitalaufenthalte erfasst. Die Erhebung, die in allen Krankenhäusern und Kliniken durchgeführt wird, umfasst neben administrativen Daten und soziodemografischen Merkmalen der Patientinnen und Patienten auch die Diagnosen und Behandlungen. Um diese Informationen zu erfassen, werden zwei medizinische Klassifikationen verwendet. Es handelt sich dabei um die ICD-10-GM für die Diagnosen und die Schweizerische Operationsklassifikation (CHOP) für die Behandlungen. Die Kodierung der Diagnosen und Behandlungen unterliegt präzisen Richtlinien. Der Bereich Medizinische Klassifikationen des Bundesamtes für Statistik (BFS) redigiert, überprüft und passt diese Regeln allenfalls an, pflegt die obengenannten Klassifikationen und unterstützt alle, die sich mit der Kodierung befassen. Das Kodierungshandbuch beinhaltet alle Kodierrichtlinien, die bis zu seiner Genehmigung veröffentlicht wurden. Das Kodierungshandbuch ist die Grundlage für die Kodierung."@de ;
+        <http://purl.org/dc/terms/format>
+                "HTML" ;
+        <http://purl.org/dc/terms/identifier>
+                "9927929-de@bundesamt-fur-statistik-bfs" ;
+        <http://purl.org/dc/terms/issued>
+                "2019-09-30T02:00:00"^^<http://www.w3.org/2001/XMLSchema#dateTime> ;
+        <http://purl.org/dc/terms/language>
+                "de" ;
+        <http://purl.org/dc/terms/rights>
+                "NonCommercialAllowed-CommercialWithPermission-ReferenceRequired" ;
+        <http://purl.org/dc/terms/title>
+                "Medizinisches Kodierungshandbuch. Der offizielle Leitfaden der Kodierrichtlinien in der Schweiz"@de , ""@en ;
+        <http://www.w3.org/ns/dcat#accessURL>
+                <https://www.bfs.admin.ch/asset/de/543-2000> ;
+        <http://www.w3.org/ns/dcat#mediaType>
+                "text/html" .

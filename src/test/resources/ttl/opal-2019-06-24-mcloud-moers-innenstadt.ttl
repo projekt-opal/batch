@@ -1,0 +1,14 @@
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix dcat:  <http://www.w3.org/ns/dcat#> .
+
+<http://projekt-opal.de/dataset/_mcloudde_stadtmoersbersichtskartederinnenstadtvonmoers>
+        a                  dcat:Dataset ;
+        dct:description    "Der Datensatz enthält eine Übersichtkarte der Moerser Innenstadt mit Verkehrsanbindung und Infos zu Sehenswürdigkeiten sowie öffentlichen Einrichtungen." ;
+        dct:issued         "26.09.2016" ;
+        dct:publisher      <http://projekt-opal.de/agent/_mcloudde_stadtmoersbersichtskartederinnenstadtvonmoers> ;
+        dct:title          "Stadt Moers: Übersichtskarte der Innenstadt von Moers" ;
+        dcat:distribution  <http://projekt-opal.de/distribution/_mcloudde_stadtmoersbersichtskartederinnenstadtvonmoers_2> , <http://projekt-opal.de/distribution/_mcloudde_stadtmoersbersichtskartederinnenstadtvonmoers_0> , <http://projekt-opal.de/distribution/_mcloudde_stadtmoersbersichtskartederinnenstadtvonmoers_1> ;
+        dcat:landingPage   <https://mcloud.de/web/guest/suche/-/results/detail/_mcloudde_stadtmoersbersichtskartederinnenstadtvonmoers?_mcloudsearchportlet_backURL=https%3A%2F%2Fmcloud.de%2Fweb%2Fguest%2Fsuche%2F-%2Fresults%2FsearchAction%3F_mcloudsearchportlet_page%3D54%26_mcloudsearchportlet_sort%3Dlatest> ;
+        dcat:theme         <http://projeckt-opal.de/theme/mcloud/street> ;
+        <http://www.w3.org/ns/dqv#hasQualityMeasurement>
+                <http://projekt-opal.de/measurement1925> , <http://projekt-opal.de/measurement1919> , <http://projekt-opal.de/measurement1920> , <http://projekt-opal.de/measurement1924> , <http://projekt-opal.de/measurement1923> , <http://projekt-opal.de/measurement1922> , <http://projekt-opal.de/measurement1921> .

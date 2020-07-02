@@ -37,6 +37,8 @@ import org.junit.Test;
  */
 public class GetDateFormatsTest implements ModelProcessor {
 
+	private static final boolean SKIP_TEST = true;
+
 	private static final Logger LOGGER = LogManager.getLogger();
 
 	Set<String> datatypeUris = new TreeSet<>();
@@ -46,11 +48,11 @@ public class GetDateFormatsTest implements ModelProcessor {
 	public void test() throws Exception {
 
 		// Does not test functionality
-		Assume.assumeTrue("Development test", false);
+		Assume.assumeFalse("Development test", SKIP_TEST);
 
 		String input = null, inputGraph = null;
 
-		if (Boolean.TRUE) {
+		if (Boolean.FALSE) {
 			// https://hobbitdata.informatik.uni-leipzig.de/OPAL/OpalGraph/2019-06-24/
 			input = "/home/adi/DICE/Data/OpalGraph/2019-06-24/subset";
 			inputGraph = null;

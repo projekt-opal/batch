@@ -2,6 +2,7 @@ package org.dice_research.opal.batch.reader;
 
 import java.io.File;
 
+import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.ResIterator;
@@ -101,11 +102,16 @@ public class RdfFileReader implements RdfReader {
 
 	private static Model loadFile(File file) {
 		LOGGER.info("Reading: " + file.getAbsolutePath() + " " + file.length() / 1000000 + " MB");
-		return RDFDataMgr.loadModel(file.toURI().toString());
+		Model model = RDFDataMgr.loadModel(file.toURI().toString());
+		LOGGER.info("Read model, size: " + model.size());
+		return model;
 	}
 
 	private static Model loadNquadsGraph(File nquadsFile, String graphName) {
 		LOGGER.info("Reading: " + nquadsFile.getAbsolutePath() + " " + nquadsFile.length() / 1000000 + " MB");
-		return RDFDataMgr.loadDataset(nquadsFile.toURI().toString(), Lang.NQUADS).getNamedModel(graphName);
+		Dataset dataset = RDFDataMgr.loadDataset(nquadsFile.toURI().toString(), Lang.NQUADS);
+		Model model = dataset.getNamedModel(graphName);
+		LOGGER.info("Got graph '" + graphName + "', size: " + model.size());
+		return model;
 	}
 }

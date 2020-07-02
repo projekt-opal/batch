@@ -45,6 +45,7 @@ public class Batch {
 	}
 
 	private List<ModelProcessor> modelProcessors;
+	private long couterProcessedModels = 0;
 
 	public void execute(Cfg cfg) throws Exception {
 		execute(cfg, new Processors().createModelProcessors(cfg));
@@ -69,6 +70,7 @@ public class Batch {
 		}
 
 		LOGGER.info("Run time (secs): " + 1f * (System.currentTimeMillis() - time) / 1000);
+		LOGGER.info("Processed models: " + couterProcessedModels);
 	}
 
 	private void processDirectory(File inputDirectory, String inputGraphName, File outputDirectory, Lang outputLang) {
@@ -132,5 +134,6 @@ public class Batch {
 		for (ModelProcessor modelProcessor : modelProcessors) {
 			modelProcessor.processModel(model, datasetUri);
 		}
+		couterProcessedModels++;
 	}
 }

@@ -10,33 +10,7 @@ This component reads RDF files and applies the following OPAL components:
 ## How to use
 
 Create a copy of the [default.properties](default.properties) file and edit the copy.
-
-For processing files containing triples (e.g. TURTLE files), add configuration values like the following:
-
-```
-# Input file or directory
-io.input = dcat.ttl 
-
-# Optional: Named graph of N-quads input file
-io.inputGraph = 
-
-# Output file or directory
-io.output = dcat-out.ttl 
-```
-
-For processing files containing triples and graphs (e.g. N-Quads files), add configuration values like the following:
-
-```
-# Input file or directory
-io.input = dcat.nq 
-
-# Optional: Named graph of N-quads input file
-io.inputGraph = graphName
-
-# Output file or directory
-io.output = dcat-out.ttl 
-```
-
+At least, set `io.input` and `io.outputDirectory`.
 Finally, use the [Batch](src/main/java/org/dice_research/opal/batch/Batch.java) class to process the DCAT data.
 
 
@@ -47,12 +21,6 @@ and using the [Data Catalog Vocabulary (DCAT)](https://www.w3.org/TR/vocab-dcat-
 
 You can find ready-to go input data at the Hobbitdata Server.
 Data from open data portals is available in the directories [OPAL/processed_datasets](https://hobbitdata.informatik.uni-leipzig.de/OPAL/processed_datasets/) and [OPAL/SourceGraphs](https://hobbitdata.informatik.uni-leipzig.de/OPAL/SourceGraphs/).
-
-
-## Use it for your own ideas
-
-You can use this component to play around with DCAT data.
-An example is provided by [PrintDatasetUrisTest](src/test/java/misc/PrintDatasetUrisTest.java).
 
 
 ## Credits

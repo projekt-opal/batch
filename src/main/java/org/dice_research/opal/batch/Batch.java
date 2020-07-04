@@ -2,6 +2,7 @@ package org.dice_research.opal.batch;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -45,13 +46,28 @@ public class Batch {
 		}
 	}
 
-	private List<ModelProcessor> modelProcessors;
-	private long couterProcessedModels = 0;
+	private List<File> inputs;
+	private String inputGraph;
 
+	private File outputDirectory;
+	private String outputTitle;
+	private Lang outputLanguage;
+	private int outputSize;
+
+	private RdfWriter rdfWriter;
+	private List<ModelProcessor> modelProcessors;
+	private long processedModels = 0;
+
+	/**
+	 * Executes batch with given configuration and default processors.
+	 */
 	public void execute(Cfg cfg) throws Exception {
 		execute(cfg, new Processors().createModelProcessors(cfg));
 	}
 
+	/**
+	 * Executes batch with given configuration and processors.
+	 */
 	public void execute(Cfg cfg, Processors processors) throws Exception {
 		long time = System.currentTimeMillis();
 
@@ -59,41 +75,74 @@ public class Batch {
 		this.modelProcessors = processors.getModelProcessors();
 
 		// Configure I/O
-		File inputFile = checkInput(cfg);
-		File outputFile = null;
-		if (!cfg.get(CfgKeys.IO_OUTPUT).trim().isEmpty()) {
-			new File(cfg.get(CfgKeys.IO_OUTPUT));
-		}
-		String inputGraph = cfg.get(CfgKeys.IO_INPUT_GRAPH);
+		checkInput(cfg);
+		checkOutput(cfg);
+		setRdfWriter();
 
 		// Process data
-		if (inputFile.isFile()) {
-			processFile(inputFile, inputGraph, outputFile, Lang.TURTLE);
-		} else {
-			processDirectory(inputFile, inputGraph, outputFile, Lang.TURTLE);
+		for (File input : inputs) {
+			if (input.isFile()) {
+				processFile(input);
+			} else {
+				processDirectory(input);
+			}
 		}
+		rdfWriter.finish();
 
 		LOGGER.info("Run time (secs): " + 1f * (System.currentTimeMillis() - time) / 1000);
-		LOGGER.info("Processed models: " + couterProcessedModels);
+		LOGGER.info("Processed models: " + processedModels);
 	}
 
-	private File checkInput(Cfg cfg) {
+	private void checkInput(Cfg cfg) {
 		if (!cfg.has(CfgKeys.IO_INPUT)) {
 			throw new RuntimeException("No input set.");
 		}
-
-		File file = new File(cfg.get(CfgKeys.IO_INPUT));
-		if (!file.canRead()) {
-			throw new RuntimeException("Can not read input: " + file.getAbsolutePath());
+		inputs = new LinkedList<>();
+		for (String inputString : cfg.get(CfgKeys.IO_INPUT).split("\\|")) {
+			File file = new File(inputString.trim());
+			if (!file.canRead()) {
+				throw new RuntimeException("Can not read input: " + file.getAbsolutePath());
+			}
+			inputs.add(file);
 		}
 
-		return file;
+		if (cfg.has(CfgKeys.IO_INPUT_GRAPH)) {
+			inputGraph = cfg.get(CfgKeys.IO_INPUT_GRAPH);
+		}
 	}
 
-	private void processDirectory(File inputDirectory, String inputGraphName, File outputDirectory, Lang outputLang) {
-		if (!inputDirectory.canRead()) {
-			throw new RuntimeException("Can not read: " + inputDirectory.getAbsolutePath());
+	private void checkOutput(Cfg cfg) {
+		if (!cfg.has(CfgKeys.IO_OUTPUT_DIRECTORY)) {
+			throw new RuntimeException("No output directory set.");
 		}
+		outputDirectory = new File(cfg.get(CfgKeys.IO_OUTPUT_DIRECTORY));
+		if (!outputDirectory.exists()) {
+			outputDirectory.mkdirs();
+		}
+		if (!outputDirectory.canWrite()) {
+			throw new RuntimeException("Can not write output directory: " + outputDirectory.getAbsolutePath());
+		}
+
+		if (!cfg.has(CfgKeys.IO_OUTPUT_TITLE)) {
+			throw new RuntimeException("No output title set.");
+		}
+		outputTitle = cfg.get(CfgKeys.IO_OUTPUT_TITLE);
+
+		if (!cfg.has(CfgKeys.IO_OUTPUT_FORMAT)) {
+			throw new RuntimeException("No output format set.");
+		}
+		outputLanguage = RDFLanguages.fileExtToLang(cfg.get(CfgKeys.IO_OUTPUT_FORMAT));
+		if (outputLanguage == null) {
+			throw new RuntimeException("Unknown output format: " + cfg.get(CfgKeys.IO_OUTPUT_FORMAT));
+		}
+
+		if (!cfg.has(CfgKeys.IO_OUTPUT_SIZE)) {
+			throw new RuntimeException("No output size set.");
+		}
+		outputSize = Integer.parseInt(cfg.get(CfgKeys.IO_OUTPUT_SIZE));
+	}
+
+	private void processDirectory(File inputDirectory) {
 
 		// Get files
 		Set<String> fileExtensions = getFileExtensions();
@@ -113,30 +162,18 @@ public class Batch {
 		// Process
 		LOGGER.info("Processing " + inputFiles.length + " files in " + inputDirectory.getAbsolutePath());
 		for (File inputFile : inputFiles) {
-			File outputFile = null;
-			if (outputDirectory != null) {
-				new File(outputDirectory, inputFile.getName());
-			}
 			try {
-				processFile(inputFile, inputGraphName, outputFile, outputLang);
+				processFile(inputFile);
 			} catch (Exception e) {
 				LOGGER.error("Error in processing " + inputFile.getAbsolutePath(), e);
 			}
 		}
 	}
 
-	private void processFile(File inputFile, String inputGraphName, File outputFile, Lang outputLang) throws Exception {
-
+	private void processFile(File inputFile) throws Exception {
 		RdfFileReader rdfFileReader = new RdfFileReader().setFile(inputFile);
-		if (inputGraphName != null && !inputGraphName.isEmpty()) {
-			rdfFileReader.setGraphName(inputGraphName);
-		}
-
-		RdfWriter rdfWriter = null;
-		if (outputFile != null) {
-			rdfWriter = new RdfFileWriter().setFile(outputFile).setLang(outputLang);
-		} else {
-			rdfWriter = new DummyWriter();
+		if (inputGraph != null) {
+			rdfFileReader.setGraphName(inputGraph);
 		}
 
 		while (rdfFileReader.hasNext()) {
@@ -144,14 +181,13 @@ public class Batch {
 			processModel(result.getModel(), result.getDatasetUri());
 			rdfWriter.write(result.getModel());
 		}
-		rdfWriter.finish();
 	}
 
 	private void processModel(Model model, String datasetUri) throws Exception {
 		for (ModelProcessor modelProcessor : modelProcessors) {
 			modelProcessor.processModel(model, datasetUri);
 		}
-		couterProcessedModels++;
+		processedModels++;
 	}
 
 	private Set<String> getFileExtensions() {
@@ -160,5 +196,20 @@ public class Batch {
 			fileExtensions.addAll(lang.getFileExtensions());
 		}
 		return fileExtensions;
+	}
+
+	private RdfWriter setRdfWriter() {
+		rdfWriter = null;
+		if (outputDirectory != null) {
+			RdfFileWriter rdfFileWriter = new RdfFileWriter();
+			rdfFileWriter.directory = outputDirectory;
+			rdfFileWriter.title = outputTitle;
+			rdfFileWriter.lang = outputLanguage;
+			rdfFileWriter.maxModels = outputSize;
+			rdfWriter = rdfFileWriter;
+		} else {
+			rdfWriter = new DummyWriter();
+		}
+		return rdfWriter;
 	}
 }

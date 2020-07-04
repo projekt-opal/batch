@@ -39,7 +39,7 @@ public class Cfg {
 	}
 
 	public String get(String key) {
-		return properties.getProperty(key);
+		return properties.getProperty(key).trim();
 	}
 
 	public boolean getBoolean(String key) {

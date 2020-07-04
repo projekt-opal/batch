@@ -8,8 +8,12 @@ package org.dice_research.opal.batch.configuration;
 public abstract class CfgKeys {
 
 	public static final String IO_INPUT = "io.input";
-	public static final String IO_OUTPUT = "io.output";
 	public static final String IO_INPUT_GRAPH = "io.inputGraph";
+
+	public static final String IO_OUTPUT_DIRECTORY = "io.outputDirectory";
+	public static final String IO_OUTPUT_TITLE = "io.outputTitle";
+	public static final String IO_OUTPUT_FORMAT = "io.outputFormat";
+	public static final String IO_OUTPUT_SIZE = "io.outputSize";
 
 	public static final String RUN_CATFISH = "catfish";
 	public static final String RUN_LANG = "metadata.LanguageDetection";

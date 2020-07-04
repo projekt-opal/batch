@@ -58,12 +58,14 @@ public class PrintDatasetUrisTest implements ModelProcessor {
 		Cfg cfg = new Cfg();
 		cfg.set(CfgKeys.IO_INPUT, inputFile.getAbsolutePath());
 		cfg.set(CfgKeys.IO_INPUT_GRAPH, graphName);
-		cfg.set(CfgKeys.IO_OUTPUT, outputFile.getAbsolutePath());
+		// TODO
+//		cfg.set(CfgKeys.IO_OUTPUT, outputFile.getAbsolutePath());
 
 		// Info strings for the execution.
 		LOGGER.info("Input data:  " + cfg.get(CfgKeys.IO_INPUT));
 		LOGGER.info("Input graph: " + cfg.get(CfgKeys.IO_INPUT_GRAPH));
-		LOGGER.info("Output data: " + cfg.get(CfgKeys.IO_OUTPUT));
+		// TODO
+//		LOGGER.info("Output data: " + cfg.get(CfgKeys.IO_OUTPUT));
 
 		// We will only use this class as a processor.
 		Processors processors = new Processors();

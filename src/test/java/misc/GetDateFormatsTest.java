@@ -80,7 +80,8 @@ public class GetDateFormatsTest implements ModelProcessor {
 		}
 
 		File outputDirectory = new File(System.getProperty("java.io.tmpdir"), this.getClass().getName());
-		cfg.set(CfgKeys.IO_OUTPUT, outputDirectory.getAbsolutePath());
+		// TODO
+//		cfg.set(CfgKeys.IO_OUTPUT, outputDirectory.getAbsolutePath());
 
 		Processors processors = new Processors();
 		processors.addModelProcessor(this);

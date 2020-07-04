@@ -1,6 +1,10 @@
 # OpenNLP language model
 *.bin
 
+# Local configurations
+local/
+
+
 
 
 ### https://github.com/github/gitignore/blob/master/Java.gitignore

@@ -11,6 +11,7 @@ import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFLanguages;
 import org.apache.jena.vocabulary.DCAT;
 import org.apache.jena.vocabulary.RDF;
 import org.apache.logging.log4j.LogManager;
@@ -82,10 +83,10 @@ public class RdfFileReader implements RdfReader {
 			throw new RuntimeException("Can not read: " + file.getAbsolutePath());
 		}
 
-		if (graphName == null) {
-			datasetIterator = loadFile(file).listResourcesWithProperty(RDF.type, DCAT.Dataset);
-		} else {
+		if (RDFLanguages.isQuads(RDFLanguages.filenameToLang(file.getName())) && graphName != null) {
 			datasetIterator = loadNquadsGraph(file, graphName).listResourcesWithProperty(RDF.type, DCAT.Dataset);
+		} else {
+			datasetIterator = loadFile(file).listResourcesWithProperty(RDF.type, DCAT.Dataset);
 		}
 	}
 

@@ -15,78 +15,56 @@ public class RdfFileWriter implements RdfWriter {
 
 	private static final Logger LOGGER = LogManager.getLogger();
 
-	private File file = null;
-	private Lang lang = null;
+	public File directory;
+	public Lang lang;
+	public String title;
+	public int maxModels;
+
+	File file;
 	private FileOutputStream fileOutputStream = null;
-
-	public RdfFileWriter setFile(File file) {
-		this.file = file;
-		return this;
-	}
-
-	public RdfFileWriter setLang(Lang lang) {
-		this.lang = lang;
-		return this;
-	}
-
-	public File getFile() {
-		return file;
-	}
-
-	public Lang getLang() {
-		return lang;
-	}
+	private int modelCounter = 0;
+	private int fileCounter = 1;
 
 	@Override
 	public RdfWriter write(Model model) {
+
 		if (fileOutputStream == null) {
-			initialize();
+			file = new File(directory, title + "-" + fileCounter + "." + lang.getFileExtensions().get(0));
+			if (file.exists()) {
+				file.delete();
+			}
+			try {
+				fileOutputStream = new FileOutputStream(file, true);
+			} catch (FileNotFoundException e) {
+				throw new RuntimeException(e);
+			}
 		}
 
 		RDFDataMgr.write(fileOutputStream, model, lang);
+		modelCounter++;
+
+		if (modelCounter == maxModels) {
+			finish();
+		}
 
 		return this;
-	}
-
-	private void initialize() {
-		if (file == null) {
-			throw new RuntimeException("No file specified");
-			
-		} else if (!file.exists()) {
-			if (!file.getParentFile().exists()) {
-				file.getParentFile().mkdirs();
-			}
-			
-			try {
-				file.createNewFile();
-			} catch (IOException e) {
-				throw new RuntimeException("Could not create: " + file.getAbsolutePath());
-			}
-			
-		} else if (!file.canWrite()) {
-			throw new RuntimeException("Can not write: " + file.getAbsolutePath());
-		}
-
-		if (lang == null) {
-			throw new RuntimeException("No language specified");
-		}
-
-		try {
-			fileOutputStream = new FileOutputStream(file, true);
-		} catch (FileNotFoundException e) {
-			// Is already handeled above
-			throw new RuntimeException(e);
-		}
 	}
 
 	@Override
 	public RdfWriter finish() {
-		LOGGER.info("Wrote: " + file.getAbsolutePath() + " " + file.length() / 1000000 + " MB");
-		try {
-			fileOutputStream.close();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		if (file != null) {
+			LOGGER.info("Wrote: " + file.getAbsolutePath() + " (" + modelCounter + " datasets)");
+			try {
+				fileOutputStream.close();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 		}
+
+		file = null;
+		fileOutputStream = null;
+		modelCounter = 0;
+		fileCounter++;
 
 		return this;
 	}

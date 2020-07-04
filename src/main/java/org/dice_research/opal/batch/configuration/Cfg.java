@@ -59,7 +59,7 @@ public class Cfg {
 	}
 
 	public boolean has(String key) {
-		return properties.containsKey(key);
+		return properties.containsKey(key) && !properties.getProperty(key).trim().isEmpty();
 	}
 
 	public Cfg set(String key, String value) {

@@ -1,9 +1,10 @@
-package org.dice_research.opal.batch.processor;
+package org.dice_research.opal.batch.processor.opal;
 
 import java.util.List;
 
 import org.dice_research.opal.batch.configuration.Cfg;
 import org.dice_research.opal.batch.configuration.CfgKeys;
+import org.dice_research.opal.batch.processor.AbstractProcessor;
 import org.dice_research.opal.common.interfaces.ModelProcessor;
 import org.dice_research.opal.metadata.LanguageDetection;
 

@@ -14,6 +14,8 @@ public abstract class AbstractProcessor {
 
 	/**
 	 * Adds a new model processor instance, if is set in the given configuration.
+	 * 
+	 * @return if the processor was added.
 	 */
 	public boolean addModelProcessor(Cfg cfg, List<ModelProcessor> processors, String key) {
 		if (cfg.getBoolean(key)) {
@@ -26,6 +28,8 @@ public abstract class AbstractProcessor {
 
 	/**
 	 * Adds a new model processor instance, if is set in the given configuration.
+	 * 
+	 * @return if the processor was added.
 	 */
 	public abstract boolean addModelProcessor(Cfg cfg, List<ModelProcessor> processors);
 

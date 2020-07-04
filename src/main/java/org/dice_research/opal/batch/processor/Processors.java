@@ -4,6 +4,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.dice_research.opal.batch.configuration.Cfg;
+import org.dice_research.opal.batch.processor.opal.CatfishProcessor;
+import org.dice_research.opal.batch.processor.opal.CivetProcessor;
+import org.dice_research.opal.batch.processor.opal.GeoDataProcessor;
+import org.dice_research.opal.batch.processor.opal.LanguageDetectionProcessor;
 import org.dice_research.opal.common.interfaces.ModelProcessor;
 
 /**

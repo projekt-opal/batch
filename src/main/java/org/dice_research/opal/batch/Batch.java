@@ -16,6 +16,7 @@ import org.dice_research.opal.batch.configuration.CfgKeys;
 import org.dice_research.opal.batch.processor.Processors;
 import org.dice_research.opal.batch.reader.RdfFileReader;
 import org.dice_research.opal.batch.reader.RdfReaderResult;
+import org.dice_research.opal.batch.writer.DummyWriter;
 import org.dice_research.opal.batch.writer.RdfFileWriter;
 import org.dice_research.opal.batch.writer.RdfWriter;
 import org.dice_research.opal.common.interfaces.ModelProcessor;
@@ -58,8 +59,11 @@ public class Batch {
 		this.modelProcessors = processors.getModelProcessors();
 
 		// Configure I/O
-		File inputFile = new File(cfg.get(CfgKeys.IO_INPUT));
-		File outputFile = new File(cfg.get(CfgKeys.IO_OUTPUT));
+		File inputFile = checkInput(cfg);
+		File outputFile = null;
+		if (!cfg.get(CfgKeys.IO_OUTPUT).trim().isEmpty()) {
+			new File(cfg.get(CfgKeys.IO_OUTPUT));
+		}
 		String inputGraph = cfg.get(CfgKeys.IO_INPUT_GRAPH);
 
 		// Process data
@@ -71,6 +75,19 @@ public class Batch {
 
 		LOGGER.info("Run time (secs): " + 1f * (System.currentTimeMillis() - time) / 1000);
 		LOGGER.info("Processed models: " + couterProcessedModels);
+	}
+
+	private File checkInput(Cfg cfg) {
+		if (!cfg.has(CfgKeys.IO_INPUT)) {
+			throw new RuntimeException("No input set.");
+		}
+
+		File file = new File(cfg.get(CfgKeys.IO_INPUT));
+		if (!file.canRead()) {
+			throw new RuntimeException("Can not read input: " + file.getAbsolutePath());
+		}
+
+		return file;
 	}
 
 	private void processDirectory(File inputDirectory, String inputGraphName, File outputDirectory, Lang outputLang) {
@@ -94,23 +111,18 @@ public class Batch {
 		});
 
 		// Process
-		LOGGER.info("Processing " + inputFiles.length + " files in " + outputDirectory.getAbsolutePath());
+		LOGGER.info("Processing " + inputFiles.length + " files in " + inputDirectory.getAbsolutePath());
 		for (File inputFile : inputFiles) {
-			File outputFile = new File(outputDirectory, inputFile.getName());
+			File outputFile = null;
+			if (outputDirectory != null) {
+				new File(outputDirectory, inputFile.getName());
+			}
 			try {
 				processFile(inputFile, inputGraphName, outputFile, outputLang);
 			} catch (Exception e) {
 				LOGGER.error("Error in processing " + inputFile.getAbsolutePath(), e);
 			}
 		}
-	}
-
-	private Set<String> getFileExtensions() {
-		Set<String> fileExtensions = new TreeSet<>();
-		for (Lang lang : RDFLanguages.getRegisteredLanguages()) {
-			fileExtensions.addAll(lang.getFileExtensions());
-		}
-		return fileExtensions;
 	}
 
 	private void processFile(File inputFile, String inputGraphName, File outputFile, Lang outputLang) throws Exception {
@@ -120,7 +132,12 @@ public class Batch {
 			rdfFileReader.setGraphName(inputGraphName);
 		}
 
-		RdfWriter rdfWriter = new RdfFileWriter().setFile(outputFile).setLang(outputLang);
+		RdfWriter rdfWriter = null;
+		if (outputFile != null) {
+			rdfWriter = new RdfFileWriter().setFile(outputFile).setLang(outputLang);
+		} else {
+			rdfWriter = new DummyWriter();
+		}
 
 		while (rdfFileReader.hasNext()) {
 			RdfReaderResult result = rdfFileReader.next();
@@ -135,5 +152,13 @@ public class Batch {
 			modelProcessor.processModel(model, datasetUri);
 		}
 		couterProcessedModels++;
+	}
+
+	private Set<String> getFileExtensions() {
+		Set<String> fileExtensions = new TreeSet<>();
+		for (Lang lang : RDFLanguages.getRegisteredLanguages()) {
+			fileExtensions.addAll(lang.getFileExtensions());
+		}
+		return fileExtensions;
 	}
 }

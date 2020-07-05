@@ -1,10 +1,10 @@
-package org.dice_research.opal.batch.processor.opal;
+package org.dice_research.opal.batch.construction.opal;
 
 import java.util.List;
 
 import org.dice_research.opal.batch.configuration.Cfg;
 import org.dice_research.opal.batch.configuration.CfgKeys;
-import org.dice_research.opal.batch.processor.AbstractProcessor;
+import org.dice_research.opal.batch.construction.AbstractConstructor;
 import org.dice_research.opal.civet.Civet;
 import org.dice_research.opal.common.interfaces.ModelProcessor;
 
@@ -15,7 +15,7 @@ import org.dice_research.opal.common.interfaces.ModelProcessor;
  *
  * @author Adrian Wilke
  */
-public class CivetProcessor extends AbstractProcessor {
+public class CivetConstructor extends AbstractConstructor {
 
 	public boolean addModelProcessor(Cfg cfg, List<ModelProcessor> processors) {
 		return super.addModelProcessor(cfg, processors, CfgKeys.RUN_CIVET);

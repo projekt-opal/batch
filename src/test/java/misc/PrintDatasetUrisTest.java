@@ -14,7 +14,7 @@ import org.dice_research.opal.batch.Batch;
 import org.dice_research.opal.batch.TestFiles;
 import org.dice_research.opal.batch.configuration.Cfg;
 import org.dice_research.opal.batch.configuration.CfgKeys;
-import org.dice_research.opal.batch.processor.Processors;
+import org.dice_research.opal.batch.construction.ConstructorManager;
 import org.dice_research.opal.common.interfaces.ModelProcessor;
 import org.junit.Assume;
 import org.junit.Test;
@@ -68,7 +68,7 @@ public class PrintDatasetUrisTest implements ModelProcessor {
 //		LOGGER.info("Output data: " + cfg.get(CfgKeys.IO_OUTPUT));
 
 		// We will only use this class as a processor.
-		Processors processors = new Processors();
+		ConstructorManager processors = new ConstructorManager();
 		processors.addModelProcessor(this);
 
 		// Read, process, write.

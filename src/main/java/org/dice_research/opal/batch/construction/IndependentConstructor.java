@@ -1,4 +1,4 @@
-package org.dice_research.opal.batch.processor;
+package org.dice_research.opal.batch.construction;
 
 import java.util.List;
 
@@ -6,21 +6,21 @@ import org.dice_research.opal.batch.configuration.Cfg;
 import org.dice_research.opal.common.interfaces.ModelProcessor;
 
 /**
- * Creates a processor which ignores {@link Cfg}.
+ * Creates a constructor which ignores {@link Cfg}.
  * 
  * Usage: Use {@link #create(ModelProcessor)}.
  *
  * @author Adrian Wilke
  */
-public class IndependentProcessor extends AbstractProcessor {
+public class IndependentConstructor extends AbstractConstructor {
 
-	public static IndependentProcessor create(ModelProcessor modelProcessor) {
-		return new IndependentProcessor(modelProcessor);
+	public static IndependentConstructor create(ModelProcessor modelProcessor) {
+		return new IndependentConstructor(modelProcessor);
 	}
 
 	private ModelProcessor modelProcessor;
 
-	public IndependentProcessor(ModelProcessor modelProcessor) {
+	public IndependentConstructor(ModelProcessor modelProcessor) {
 		this.modelProcessor = modelProcessor;
 	}
 
@@ -28,7 +28,7 @@ public class IndependentProcessor extends AbstractProcessor {
 		return modelProcessor;
 	}
 
-	public IndependentProcessor setModelProcessor(ModelProcessor modelProcessor) {
+	public IndependentConstructor setModelProcessor(ModelProcessor modelProcessor) {
 		this.modelProcessor = modelProcessor;
 		return this;
 	}

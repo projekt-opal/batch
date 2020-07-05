@@ -102,17 +102,17 @@ public class RdfFileReader implements RdfReader {
 	}
 
 	private static Model loadFile(File file) {
-		LOGGER.info("Reading: " + file.getAbsolutePath() + " " + file.length() / 1000000 + " MB");
+		LOGGER.debug("Reading: " + file.getAbsolutePath() + " " + file.length() / 1000000 + " MB");
 		Model model = RDFDataMgr.loadModel(file.toURI().toString());
-		LOGGER.info("Read model, size: " + model.size());
+		LOGGER.debug("Read model, size: " + model.size());
 		return model;
 	}
 
 	private static Model loadNquadsGraph(File nquadsFile, String graphName) {
-		LOGGER.info("Reading: " + nquadsFile.getAbsolutePath() + " " + nquadsFile.length() / 1000000 + " MB");
+		LOGGER.debug("Reading: " + nquadsFile.getAbsolutePath() + " " + nquadsFile.length() / 1000000 + " MB");
 		Dataset dataset = RDFDataMgr.loadDataset(nquadsFile.toURI().toString(), Lang.NQUADS);
 		Model model = dataset.getNamedModel(graphName);
-		LOGGER.info("Got graph '" + graphName + "', size: " + model.size());
+		LOGGER.debug("Got graph '" + graphName + "', size: " + model.size());
 		return model;
 	}
 }

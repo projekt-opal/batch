@@ -15,10 +15,12 @@ public abstract class CfgKeys {
 	public static final String IO_OUTPUT_FORMAT = "io.outputFormat";
 	public static final String IO_OUTPUT_SIZE = "io.outputSize";
 
-	public static final String RUN_CATFISH = "catfish";
-	public static final String RUN_LANG = "metadata.LanguageDetection";
-	public static final String RUN_GEO = "metadata.GeoData";
-	public static final String RUN_CIVET = "civet";
+	public static final String RUN_CATFISH = "run.catfish";
+	public static final String RUN_LANG = "run.languageDetection";
+	public static final String RUN_GEO = "run.geoData";
+	public static final String RUN_CIVET = "run.civet";
+
+	public static final String RUN_THEME_COUNTER = "run.themes";
 
 	public static final String CATFISH_EMPTY_BLANK_NODES = "catfish.cleanEmptyBlankNodes";
 	public static final String CATFISH_LITERALS = "catfish.cleanLiterals";

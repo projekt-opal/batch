@@ -7,7 +7,7 @@ import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.DCAT;
-import org.dice_research.opal.batch.processor.internal.StringCounter;
+import org.dice_research.opal.batch.construction.internal.StringCounter;
 import org.dice_research.opal.common.interfaces.ModelProcessor;
 
 /**

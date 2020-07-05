@@ -29,12 +29,15 @@ public class Cfg {
 
 	public Cfg(File file) {
 		LOGGER.info("Configuration: " + file.getAbsolutePath());
+		if (!file.canRead()) {
+			throw new CfgException("Can not read configuration file: " + file.getAbsolutePath());
+		}
 
 		properties = new Properties();
 		try {
 			properties.load(new FileReader(file));
 		} catch (IOException e) {
-			throw new RuntimeException(e);
+			throw new CfgException(e);
 		}
 	}
 

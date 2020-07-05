@@ -13,8 +13,10 @@ import org.apache.jena.riot.RDFLanguages;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dice_research.opal.batch.configuration.Cfg;
+import org.dice_research.opal.batch.configuration.CfgException;
 import org.dice_research.opal.batch.configuration.CfgKeys;
-import org.dice_research.opal.batch.processor.Processors;
+import org.dice_research.opal.batch.construction.Constructor;
+import org.dice_research.opal.batch.construction.ConstructorManager;
 import org.dice_research.opal.batch.reader.RdfFileReader;
 import org.dice_research.opal.batch.reader.RdfReaderResult;
 import org.dice_research.opal.batch.writer.DummyWriter;
@@ -37,71 +39,83 @@ public class Batch {
 	 * Main entry point.
 	 */
 	public static void main(String[] args) throws Exception {
-
-		// Set default or custom configuration
-		if (args.length == 0) {
-			new Batch().execute(new Cfg());
-		} else {
-			new Batch().execute(new Cfg(new File(args[0])));
+		try {
+			if (args.length == 0) {
+				// Use default.properties
+				new Batch().execute(new Cfg());
+			} else {
+				// Use user-defined configuration
+				new Batch().execute(new Cfg(new File(args[0])));
+			}
+		} catch (CfgException e) {
+			// Handle self-defined configuration exceptions
+			System.err.println("Error: " + e.getMessage());
+			System.exit(1);
 		}
 	}
 
+	// Parsed from configuration
+
 	private List<File> inputs;
 	private String inputGraph;
-
 	private File outputDirectory;
 	private String outputTitle;
 	private Lang outputLanguage;
 	private int outputSize;
 
+	// Internal
+
 	private RdfWriter rdfWriter;
 	private List<ModelProcessor> modelProcessors;
-	private long processedModels = 0;
 
 	/**
-	 * Executes batch with given configuration and default processors.
+	 * Executes batch with given configuration and default constructors.
 	 */
 	public void execute(Cfg cfg) throws Exception {
-		execute(cfg, new Processors().createModelProcessors(cfg));
+		execute(cfg, ConstructorManager.create());
 	}
 
 	/**
-	 * Executes batch with given configuration and processors.
+	 * Executes batch with given configuration and constructors.
 	 */
-	public void execute(Cfg cfg, Processors processors) throws Exception {
-		long time = System.currentTimeMillis();
+	public void execute(Cfg cfg, ConstructorManager constructorManager) throws Exception {
 
-		// Configure components
-		this.modelProcessors = processors.getModelProcessors();
-
-		// Configure I/O
+		// Configuration
 		checkInput(cfg);
 		checkOutput(cfg);
+		modelProcessors = constructorManager.createModelProcessors(cfg).getModelProcessors();
 		setRdfWriter();
 
-		// Process data
+		// Read and process data
 		for (File input : inputs) {
-			if (input.isFile()) {
-				processFile(input);
-			} else {
+			if (input.isDirectory()) {
 				processDirectory(input);
+			} else {
+				processFile(input);
 			}
 		}
-		rdfWriter.finish();
 
-		LOGGER.info("Run time (secs): " + 1f * (System.currentTimeMillis() - time) / 1000);
-		LOGGER.info("Processed models: " + processedModels);
+		// Finalize
+		rdfWriter.finish();
+		for (Constructor constructor : constructorManager.getConstructors()) {
+			constructor.finish(cfg);
+		}
+
+		LOGGER.info("Finished. Results: " + outputDirectory.getAbsolutePath());
 	}
 
+	/**
+	 * Checks input values of configuration and sets variables.
+	 */
 	private void checkInput(Cfg cfg) {
 		if (!cfg.has(CfgKeys.IO_INPUT)) {
-			throw new RuntimeException("No input set.");
+			throw new CfgException("No input set.");
 		}
 		inputs = new LinkedList<>();
 		for (String inputString : cfg.get(CfgKeys.IO_INPUT).split("\\|")) {
 			File file = new File(inputString.trim());
 			if (!file.canRead()) {
-				throw new RuntimeException("Can not read input: " + file.getAbsolutePath());
+				throw new CfgException("Can not read input: " + file.getAbsolutePath());
 			}
 			inputs.add(file);
 		}
@@ -111,37 +125,43 @@ public class Batch {
 		}
 	}
 
+	/**
+	 * Checks output values of configuration and sets variables.
+	 */
 	private void checkOutput(Cfg cfg) {
 		if (!cfg.has(CfgKeys.IO_OUTPUT_DIRECTORY)) {
-			throw new RuntimeException("No output directory set.");
+			throw new CfgException("No output directory set.");
 		}
 		outputDirectory = new File(cfg.get(CfgKeys.IO_OUTPUT_DIRECTORY));
 		if (!outputDirectory.exists()) {
 			outputDirectory.mkdirs();
 		}
 		if (!outputDirectory.canWrite()) {
-			throw new RuntimeException("Can not write output directory: " + outputDirectory.getAbsolutePath());
+			throw new CfgException("Can not write output directory: " + outputDirectory.getAbsolutePath());
 		}
 
 		if (!cfg.has(CfgKeys.IO_OUTPUT_TITLE)) {
-			throw new RuntimeException("No output title set.");
+			throw new CfgException("No output title set.");
 		}
 		outputTitle = cfg.get(CfgKeys.IO_OUTPUT_TITLE);
 
 		if (!cfg.has(CfgKeys.IO_OUTPUT_FORMAT)) {
-			throw new RuntimeException("No output format set.");
+			throw new CfgException("No output format set.");
 		}
 		outputLanguage = RDFLanguages.fileExtToLang(cfg.get(CfgKeys.IO_OUTPUT_FORMAT));
 		if (outputLanguage == null) {
-			throw new RuntimeException("Unknown output format: " + cfg.get(CfgKeys.IO_OUTPUT_FORMAT));
+			throw new CfgException("Unknown output format: " + cfg.get(CfgKeys.IO_OUTPUT_FORMAT));
 		}
 
 		if (!cfg.has(CfgKeys.IO_OUTPUT_SIZE)) {
-			throw new RuntimeException("No output size set.");
+			throw new CfgException("No output size set.");
 		}
 		outputSize = Integer.parseInt(cfg.get(CfgKeys.IO_OUTPUT_SIZE));
 	}
 
+	/**
+	 * Processes directory and calls {@link #processFile(File)}.
+	 */
 	private void processDirectory(File inputDirectory) {
 
 		// Get files
@@ -170,6 +190,9 @@ public class Batch {
 		}
 	}
 
+	/**
+	 * Processes file and calls {@link #processModel(Model, String)}.
+	 */
 	private void processFile(File inputFile) throws Exception {
 		RdfFileReader rdfFileReader = new RdfFileReader().setFile(inputFile);
 		if (inputGraph != null) {
@@ -183,13 +206,18 @@ public class Batch {
 		}
 	}
 
+	/**
+	 * Processes model.
+	 */
 	private void processModel(Model model, String datasetUri) throws Exception {
 		for (ModelProcessor modelProcessor : modelProcessors) {
 			modelProcessor.processModel(model, datasetUri);
 		}
-		processedModels++;
 	}
 
+	/**
+	 * Gets file extensions of registered RDF languages.
+	 */
 	private Set<String> getFileExtensions() {
 		Set<String> fileExtensions = new TreeSet<>();
 		for (Lang lang : RDFLanguages.getRegisteredLanguages()) {
@@ -198,6 +226,9 @@ public class Batch {
 		return fileExtensions;
 	}
 
+	/**
+	 * Sets the RDF-writer to use.
+	 */
 	private RdfWriter setRdfWriter() {
 		rdfWriter = null;
 		if (outputDirectory != null) {

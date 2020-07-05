@@ -1,4 +1,4 @@
-package org.dice_research.opal.batch.processor;
+package org.dice_research.opal.batch.construction;
 
 import java.util.List;
 
@@ -6,11 +6,11 @@ import org.dice_research.opal.batch.configuration.Cfg;
 import org.dice_research.opal.common.interfaces.ModelProcessor;
 
 /**
- * Abstract processor.
+ * Abstract constructor.
  *
  * @author Adrian Wilke
  */
-public abstract class AbstractProcessor {
+public abstract class AbstractConstructor implements Constructor {
 
 	/**
 	 * Adds a new model processor instance, if is set in the given configuration.
@@ -37,4 +37,12 @@ public abstract class AbstractProcessor {
 	 * Creates a model processor instance based on the given configuration.
 	 */
 	public abstract ModelProcessor createModelProcessor(Cfg cfg);
+
+	/**
+	 * Default implementation: Only return instance.
+	 */
+	@Override
+	public Constructor finish(Cfg cfg) {
+		return this;
+	}
 }

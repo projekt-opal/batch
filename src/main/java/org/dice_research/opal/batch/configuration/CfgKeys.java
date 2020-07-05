@@ -21,6 +21,7 @@ public abstract class CfgKeys {
 	public static final String RUN_CIVET = "run.civet";
 
 	public static final String RUN_THEME_COUNTER = "run.themes";
+	public static final String RUN_DATE_COUNTER = "run.dates";
 
 	public static final String CATFISH_EMPTY_BLANK_NODES = "catfish.cleanEmptyBlankNodes";
 	public static final String CATFISH_LITERALS = "catfish.cleanLiterals";

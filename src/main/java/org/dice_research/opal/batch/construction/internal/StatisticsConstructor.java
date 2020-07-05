@@ -55,7 +55,7 @@ public class StatisticsConstructor extends AbstractConstructor {
 		stringBuilder.append("Processed triples:   " + statistics.triples);
 		stringBuilder.append(System.lineSeparator());
 
-		File file = new File(cfg.get(CfgKeys.IO_OUTPUT_DIRECTORY), Filenames.statistics);
+		File file = new File(cfg.get(CfgKeys.IO_OUTPUT_DIRECTORY), Filenames.STATISTICS);
 		try (FileOutputStream fos = new FileOutputStream(file)) {
 			fos.write(stringBuilder.toString().getBytes(StandardCharsets.UTF_8));
 		} catch (Exception e) {

@@ -51,7 +51,7 @@ public abstract class AbstractCounterConstructor extends AbstractConstructor {
 	@Override
 	public Constructor finish(Cfg cfg) {
 		if (cfg.getBoolean(getCfgKey())) {
-			File file = new File(cfg.get(CfgKeys.IO_OUTPUT_DIRECTORY), Filenames.themes);
+			File file = new File(cfg.get(CfgKeys.IO_OUTPUT_DIRECTORY), Filenames.THEMES);
 			try (FileOutputStream fos = new FileOutputStream(file)) {
 				for (Entry<String, Long> entry : stringCounter.getCounterSortedByValue().entrySet()) {
 					fos.write(entry.getValue().toString().getBytes(StandardCharsets.UTF_8));

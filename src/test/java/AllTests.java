@@ -4,7 +4,6 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import misc.CreateExampleFilesTest;
-import misc.GetDateFormatsTest;
 import misc.QuadsIoTest;
 
 @RunWith(Suite.class)
@@ -15,8 +14,6 @@ import misc.QuadsIoTest;
 		// The following tests should be skipped by default
 
 		CreateExampleFilesTest.class,
-
-		GetDateFormatsTest.class,
 
 		QuadsIoTest.class
 

@@ -10,7 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dice_research.opal.batch.configuration.Cfg;
 import org.dice_research.opal.batch.configuration.CfgKeys;
-import org.dice_research.opal.batch.configuration.Filenames;
 import org.dice_research.opal.batch.construction.AbstractConstructor;
 import org.dice_research.opal.batch.construction.Constructor;
 import org.dice_research.opal.batch.model.PropertyCounter;
@@ -37,6 +36,8 @@ public abstract class AbstractCounterConstructor extends AbstractConstructor {
 
 	public abstract String getProperty();
 
+	public abstract String getFilename();
+
 	@Override
 	public boolean addModelProcessor(Cfg cfg, List<ModelProcessor> processors) {
 		return super.addModelProcessor(cfg, processors, getCfgKey());
@@ -51,7 +52,7 @@ public abstract class AbstractCounterConstructor extends AbstractConstructor {
 	@Override
 	public Constructor finish(Cfg cfg) {
 		if (cfg.getBoolean(getCfgKey())) {
-			File file = new File(cfg.get(CfgKeys.IO_OUTPUT_DIRECTORY), Filenames.THEMES);
+			File file = new File(cfg.get(CfgKeys.IO_OUTPUT_DIRECTORY), getFilename());
 			try (FileOutputStream fos = new FileOutputStream(file)) {
 				for (Entry<String, Long> entry : stringCounter.getCounterSortedByValue().entrySet()) {
 					fos.write(entry.getValue().toString().getBytes(StandardCharsets.UTF_8));

@@ -38,12 +38,15 @@ public class DateFormatCounter implements ModelProcessor {
 
 	// Internal
 
-	private StringCounter stringFormatCounter;
 	private StringCounter datatypeCounter;
+	private StringCounter dateFormatCounter;
+	private StringCounter stringFormatCounter;
 
-	public DateFormatCounter(StringCounter stringFormatCounter, StringCounter datatypeCounter) {
-		this.stringFormatCounter = stringFormatCounter;
+	public DateFormatCounter(StringCounter datatypeCounter, StringCounter dateFormatCounter,
+			StringCounter stringFormatCounter) {
 		this.datatypeCounter = datatypeCounter;
+		this.dateFormatCounter = dateFormatCounter;
+		this.stringFormatCounter = stringFormatCounter;
 	}
 
 	@Override
@@ -77,7 +80,16 @@ public class DateFormatCounter implements ModelProcessor {
 				String datatypeUri = o.asLiteral().getDatatypeURI();
 				datatypeCounter.increment(datatypeUri);
 
-				if (datatypeUri.equals("http://www.w3.org/2001/XMLSchema#string")) {
+				if (datatypeUri.equals("http://www.w3.org/2001/XMLSchema#date")) {
+					String string = o.asLiteral().getString();
+					int index = string.lastIndexOf("\"^^");
+					if (index != -1) {
+						string = string.substring(1, index);
+					}
+					dateFormatCounter.increment(getStringFormat(string));
+				}
+
+				else if (datatypeUri.equals("http://www.w3.org/2001/XMLSchema#string")) {
 					String string = o.asLiteral().getString();
 					int index = string.lastIndexOf("\"^^");
 					if (index != -1) {

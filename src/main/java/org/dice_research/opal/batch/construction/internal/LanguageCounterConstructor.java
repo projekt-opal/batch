@@ -1,6 +1,6 @@
 package org.dice_research.opal.batch.construction.internal;
 
-import org.apache.jena.vocabulary.DCAT;
+import org.apache.jena.vocabulary.DCTerms;
 import org.dice_research.opal.batch.configuration.CfgKeys;
 import org.dice_research.opal.batch.configuration.Filenames;
 
@@ -9,21 +9,21 @@ import org.dice_research.opal.batch.configuration.Filenames;
  *
  * @author Adrian Wilke
  */
-public class ThemeCounterConstructor extends AbstractCounterConstructor {
+public class LanguageCounterConstructor extends AbstractCounterConstructor {
 
 	@Override
 	public String getCfgKey() {
-		return CfgKeys.RUN_THEME_COUNTER;
+		return CfgKeys.RUN_LANGUAGES_COUNTER;
 	}
 
 	@Override
 	public String getProperty() {
-		return DCAT.theme.getURI();
+		return DCTerms.language.getURI();
 	}
 
 	@Override
 	public String getFilename() {
-		return Filenames.THEMES;
+		return Filenames.LANGUAGES;
 	}
 
 }

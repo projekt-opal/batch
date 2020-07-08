@@ -25,8 +25,9 @@ public class DateFormatCounterConstructor extends AbstractConstructor {
 
 	private static final Logger LOGGER = LogManager.getLogger();
 
-	private StringCounter stringFormatCounter;
 	private StringCounter datatypeCounter;
+	private StringCounter dateFormatCounter;
+	private StringCounter stringFormatCounter;
 
 	@Override
 	public boolean addModelProcessor(Cfg cfg, List<ModelProcessor> processors) {
@@ -35,48 +36,39 @@ public class DateFormatCounterConstructor extends AbstractConstructor {
 
 	@Override
 	public ModelProcessor createModelProcessor(Cfg cfg) {
-		stringFormatCounter = new StringCounter();
 		datatypeCounter = new StringCounter();
-		return new DateFormatCounter(stringFormatCounter, datatypeCounter);
+		dateFormatCounter = new StringCounter();
+		stringFormatCounter = new StringCounter();
+		return new DateFormatCounter(datatypeCounter, dateFormatCounter, stringFormatCounter);
 	}
 
 	@Override
 	public Constructor finish(Cfg cfg) {
 
 		if (cfg.getBoolean(CfgKeys.RUN_DATE_COUNTER)) {
-
-			StringBuilder stringBuilder = new StringBuilder();
-			for (Entry<String, Long> entry : stringFormatCounter.getCounterSortedByValue().entrySet()) {
-				stringBuilder.append(entry.getValue());
-				stringBuilder.append(",");
-				stringBuilder.append(entry.getKey());
-				stringBuilder.append(System.lineSeparator());
-			}
-
-			File file = new File(cfg.get(CfgKeys.IO_OUTPUT_DIRECTORY), Filenames.DATEFORMATS);
-			try (FileOutputStream fos = new FileOutputStream(file)) {
-				fos.write(stringBuilder.toString().getBytes(StandardCharsets.UTF_8));
-			} catch (Exception e) {
-				LOGGER.error("Error on writing date format counter", e);
-			}
-
-			stringBuilder = new StringBuilder();
-			for (Entry<String, Long> entry : datatypeCounter.getCounterSortedByValue().entrySet()) {
-				stringBuilder.append(entry.getValue());
-				stringBuilder.append(",");
-				stringBuilder.append(entry.getKey());
-				stringBuilder.append(System.lineSeparator());
-			}
-
-			file = new File(cfg.get(CfgKeys.IO_OUTPUT_DIRECTORY), Filenames.DATETYPES);
-			try (FileOutputStream fos = new FileOutputStream(file)) {
-				fos.write(stringBuilder.toString().getBytes(StandardCharsets.UTF_8));
-			} catch (Exception e) {
-				LOGGER.error("Error on writing date types counter", e);
-			}
+			write(datatypeCounter, cfg.get(CfgKeys.IO_OUTPUT_DIRECTORY), Filenames.DATETYPES);
+			write(dateFormatCounter, cfg.get(CfgKeys.IO_OUTPUT_DIRECTORY), Filenames.DATEFORMATS);
+			write(stringFormatCounter, cfg.get(CfgKeys.IO_OUTPUT_DIRECTORY), Filenames.DATESTRINGFORMATS);
 		}
 
 		return this;
+	}
+
+	private void write(StringCounter stringCounter, String directory, String filename) {
+		StringBuilder stringBuilder = new StringBuilder();
+		for (Entry<String, Long> entry : stringCounter.getCounterSortedByValue().entrySet()) {
+			stringBuilder.append(entry.getValue());
+			stringBuilder.append(",");
+			stringBuilder.append(entry.getKey());
+			stringBuilder.append(System.lineSeparator());
+		}
+
+		File file = new File(directory, filename);
+		try (FileOutputStream fos = new FileOutputStream(file)) {
+			fos.write(stringBuilder.toString().getBytes(StandardCharsets.UTF_8));
+		} catch (Exception e) {
+			LOGGER.error("Error on writing date types counter", e);
+		}
 	}
 
 }

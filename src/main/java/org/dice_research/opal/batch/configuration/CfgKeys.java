@@ -7,6 +7,8 @@ package org.dice_research.opal.batch.configuration;
  */
 public abstract class CfgKeys {
 
+	public static final String INFO = "info";
+
 	public static final String IO_INPUT = "io.input";
 	public static final String IO_INPUT_GRAPH = "io.inputGraph";
 
@@ -21,6 +23,7 @@ public abstract class CfgKeys {
 	public static final String RUN_CIVET = "run.civet";
 
 	public static final String RUN_THEME_COUNTER = "run.themes";
+	public static final String RUN_LANGUAGES_COUNTER = "run.languages";
 	public static final String RUN_DATE_COUNTER = "run.dates";
 
 	public static final String CATFISH_EMPTY_BLANK_NODES = "catfish.cleanEmptyBlankNodes";

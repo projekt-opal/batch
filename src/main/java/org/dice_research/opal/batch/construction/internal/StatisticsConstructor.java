@@ -42,6 +42,11 @@ public class StatisticsConstructor extends AbstractConstructor {
 		endTime = System.currentTimeMillis();
 
 		StringBuilder stringBuilder = new StringBuilder();
+		if (cfg.has(CfgKeys.INFO)) {
+			stringBuilder.append("Info:                ");
+			stringBuilder.append(cfg.get(CfgKeys.INFO));
+			stringBuilder.append(System.lineSeparator());
+		}
 		stringBuilder.append("Start:               " + new Date(startTime).toString());
 		stringBuilder.append(System.lineSeparator());
 		stringBuilder.append("Runtime (seconds):   " + 1f * (endTime - startTime) / 1000);

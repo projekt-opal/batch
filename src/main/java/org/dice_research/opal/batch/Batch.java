@@ -20,6 +20,7 @@ import org.dice_research.opal.batch.configuration.CfgException;
 import org.dice_research.opal.batch.configuration.CfgKeys;
 import org.dice_research.opal.batch.construction.Constructor;
 import org.dice_research.opal.batch.construction.ConstructorManager;
+import org.dice_research.opal.batch.construction.opal.CatfishConstructor;
 import org.dice_research.opal.batch.reader.RdfFileReader;
 import org.dice_research.opal.batch.reader.RdfReaderResult;
 import org.dice_research.opal.batch.writer.DummyWriter;
@@ -127,6 +128,12 @@ public class Batch {
 
 		if (cfg.has(CfgKeys.IO_INPUT_GRAPH)) {
 			inputGraph = cfg.get(CfgKeys.IO_INPUT_GRAPH);
+		}
+
+		if (cfg.getBoolean(CfgKeys.RUN_CATFISH) && cfg.getBoolean(CfgKeys.CATFISH_REPLACE_URIS_CATALOG_BY_FILENAME)) {
+			String catalogId = CatfishConstructor.getCatalogId(inputs.get(0));
+			cfg.set(CfgKeys.CATFISH_REPLACE_URIS_CATALOG, catalogId);
+			LOGGER.info("Using catalog '" + catalogId + "' for replacing URIs.");
 		}
 	}
 

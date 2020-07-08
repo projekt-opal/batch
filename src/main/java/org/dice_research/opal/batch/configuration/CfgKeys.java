@@ -30,6 +30,8 @@ public abstract class CfgKeys {
 	public static final String CATFISH_LITERALS = "catfish.cleanLiterals";
 	public static final String CATFISH_FORMATS = "catfish.cleanFormats";
 	public static final String CATFISH_EQUALIZE_DATES = "catfish.equalizeDateFormats";
+	public static final String CATFISH_REPLACE_URIS_CATALOG = "catfish.replaceUrisCatalog";
+	public static final String CATFISH_REPLACE_URIS_CATALOG_BY_FILENAME = "catfish.replaceUrisCatalogByFilename";
 
 	public static final String CIVET_LONG_RUN = "civet.includeLongRunning";
 	public static final String CIVET_LOG = "civet.logIfNotComputed";

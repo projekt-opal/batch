@@ -46,7 +46,7 @@ public class Cfg {
 	}
 
 	public boolean getBoolean(String key) {
-		return Boolean.parseBoolean(properties.getProperty(key));
+		return Boolean.parseBoolean(properties.getProperty(key).trim());
 	}
 
 	public List<String> getKeys(String prefix) {

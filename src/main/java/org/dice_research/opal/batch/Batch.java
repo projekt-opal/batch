@@ -1,12 +1,15 @@
 package org.dice_research.opal.batch;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.compress.utils.IOUtils;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFLanguages;
@@ -101,6 +104,8 @@ public class Batch {
 			constructor.finish(cfg);
 		}
 
+		// Meta
+		createAdditionalFiles(cfg);
 		LOGGER.info("Finished. Results: " + outputDirectory.getAbsolutePath());
 	}
 
@@ -242,5 +247,19 @@ public class Batch {
 			rdfWriter = new DummyWriter();
 		}
 		return rdfWriter;
+	}
+
+	/**
+	 * Creates an additional file containing labels for themes.
+	 */
+	private void createAdditionalFiles(Cfg cfg) {
+		if (cfg.getBoolean(CfgKeys.ADD_LABELS)) {
+			try {
+				IOUtils.copy(getClass().getResourceAsStream("opal-themes-labels.ttl"),
+						new FileOutputStream(new File(outputDirectory, "opal-themes-labels.ttl")));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 }

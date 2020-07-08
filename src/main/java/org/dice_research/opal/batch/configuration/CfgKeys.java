@@ -32,4 +32,6 @@ public abstract class CfgKeys {
 	public static final String CIVET_LOG = "civet.logIfNotComputed";
 	public static final String CIVET_REMOVE_MEASUREMENTS = "civet.removeMeasurements";
 
+	public static final String ADD_LABELS = "add.labels";
+
 }

@@ -26,6 +26,7 @@ import org.dice_research.opal.batch.reader.RdfReaderResult;
 import org.dice_research.opal.batch.writer.DummyWriter;
 import org.dice_research.opal.batch.writer.RdfFileWriter;
 import org.dice_research.opal.batch.writer.RdfWriter;
+import org.dice_research.opal.catfish.Catfish;
 import org.dice_research.opal.common.interfaces.ModelProcessor;
 
 /**
@@ -224,6 +225,14 @@ public class Batch {
 	private void processModel(Model model, String datasetUri) throws Exception {
 		for (ModelProcessor modelProcessor : modelProcessors) {
 			modelProcessor.processModel(model, datasetUri);
+
+			// Go on with rewritten dataset URI
+			if (modelProcessor instanceof Catfish) {
+				String newDatasetUri = ((Catfish) modelProcessor).getNewDatasetUri();
+				if (newDatasetUri != null) {
+					datasetUri = newDatasetUri;
+				}
+			}
 		}
 	}
 

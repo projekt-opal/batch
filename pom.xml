@@ -20,7 +20,7 @@
 		<dependency>
 			<groupId>org.dice-research.opal</groupId>
 			<artifactId>catfish</artifactId>
-			<version>[1.0.6,2)</version>
+			<version>[1.0.7,2)</version>
 		</dependency>
 
 		<!-- https://github.com/projekt-opal/metadata-refinement -->

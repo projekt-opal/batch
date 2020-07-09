@@ -1,6 +1,8 @@
 package org.dice_research.opal.batch.reader;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -72,7 +74,7 @@ public class RdfFileReader implements RdfReader {
 
 		Model model = ModelFactory.createDefaultModel();
 		Resource dataset = datasetIterator.next();
-		addStatements(model, dataset);
+		addStatements(model, dataset, new HashSet<String>());
 		return new RdfReaderResult().setModel(model).setDatasetUri(dataset.getURI());
 	}
 
@@ -90,13 +92,19 @@ public class RdfFileReader implements RdfReader {
 		}
 	}
 
-	private void addStatements(Model model, Resource resource) {
+	private void addStatements(Model model, Resource resource, Set<String> processedResourceUris) {
+
+		processedResourceUris.add(resource.getURI());
+
 		StmtIterator stmtIterator = resource.listProperties();
 		while (stmtIterator.hasNext()) {
+
 			Statement statement = stmtIterator.next();
 			model.add(statement);
-			if (statement.getObject().isResource()) {
-				addStatements(model, statement.getObject().asResource());
+
+			if (statement.getObject().isResource()
+					&& !processedResourceUris.contains(statement.getObject().asResource().getURI())) {
+				addStatements(model, statement.getObject().asResource(), processedResourceUris);
 			}
 		}
 	}

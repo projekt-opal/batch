@@ -9,9 +9,12 @@ public abstract class Filenames {
 	public static final String LANGUAGES = "languages.csv";
 	public static final String THEMES = "themes.csv";
 
-	public static final String DATESTRINGFORMATS = "date-stringformats.csv";
-	public static final String DATEFORMATS = "date-formats.csv";
-	public static final String DATETYPES = "date-types.csv";
+	public static final String DATE_STRINGFORMATS = "date-stringformats.csv";
+	public static final String DATE_FORMATS = "date-formats.csv";
+	public static final String DATE_TYPES = "date-types.csv";
+
+	public static final String TITLE_LANGUAGES = "title-languages.csv";
+	public static final String TITLE_LANGUAGES_DE_EN = "title-languages-de-en.csv";
 
 	public static final String LABELS_THEMES = "labels-themes.ttl";
 

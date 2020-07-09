@@ -3,7 +3,7 @@ package org.dice_research.opal.batch.model;
 import org.apache.jena.rdf.model.Model;
 import org.dice_research.opal.common.interfaces.ModelProcessor;
 
-public class Info implements ModelProcessor {
+public class ModelTripleCounter implements ModelProcessor {
 
 	public long models = 0;
 	public long triples = 0;

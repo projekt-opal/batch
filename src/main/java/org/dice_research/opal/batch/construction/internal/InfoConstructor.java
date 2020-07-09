@@ -19,7 +19,7 @@ import org.dice_research.opal.batch.configuration.CfgKeys;
 import org.dice_research.opal.batch.configuration.Filenames;
 import org.dice_research.opal.batch.construction.AbstractConstructor;
 import org.dice_research.opal.batch.construction.Constructor;
-import org.dice_research.opal.batch.model.Info;
+import org.dice_research.opal.batch.model.ModelTripleCounter;
 import org.dice_research.opal.common.interfaces.ModelProcessor;
 
 public class InfoConstructor extends AbstractConstructor {
@@ -28,7 +28,7 @@ public class InfoConstructor extends AbstractConstructor {
 
 	private long startTime;
 	private long endTime;
-	private Info statistics;
+	private ModelTripleCounter modelTripleCounter;
 
 	@Override
 	public boolean addModelProcessor(Cfg cfg, List<ModelProcessor> processors) {
@@ -39,8 +39,8 @@ public class InfoConstructor extends AbstractConstructor {
 	@Override
 	public ModelProcessor createModelProcessor(Cfg cfg) {
 		startTime = System.currentTimeMillis();
-		statistics = new Info();
-		return statistics;
+		modelTripleCounter = new ModelTripleCounter();
+		return modelTripleCounter;
 	}
 
 	@Override
@@ -60,11 +60,11 @@ public class InfoConstructor extends AbstractConstructor {
 		stringBuilder.append(System.lineSeparator());
 		stringBuilder.append(System.lineSeparator());
 
-		stringBuilder.append("Processed datasets:  " + statistics.models);
+		stringBuilder.append("Processed datasets:  " + modelTripleCounter.models);
 		stringBuilder.append(System.lineSeparator());
-		stringBuilder.append("Datasets per second: " + 1f * statistics.models / ((endTime - startTime) / 1000));
+		stringBuilder.append("Datasets per second: " + 1f * modelTripleCounter.models / ((endTime - startTime) / 1000));
 		stringBuilder.append(System.lineSeparator());
-		stringBuilder.append("Processed triples:   " + statistics.triples);
+		stringBuilder.append("Processed triples:   " + modelTripleCounter.triples);
 		stringBuilder.append(System.lineSeparator());
 		stringBuilder.append(System.lineSeparator());
 
@@ -88,6 +88,7 @@ public class InfoConstructor extends AbstractConstructor {
 	}
 
 	private String getVersionNameFromManifest() {
+		// TODO: Not tested
 		// https://www.triology.de/blog/versionsnamen-mit-maven-auslesen-des-versionsnamens
 		InputStream manifestStream = getClass().getClassLoader().getResourceAsStream("META-INF/MANIFEST.MF");
 		if (manifestStream != null) {

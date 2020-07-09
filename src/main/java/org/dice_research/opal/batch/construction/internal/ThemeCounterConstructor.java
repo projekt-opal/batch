@@ -16,7 +16,7 @@ public class ThemeCounterConstructor extends AbstractCounterConstructor {
 
 	@Override
 	public String getCfgKey() {
-		return CfgKeys.RUN_THEME_COUNTER;
+		return CfgKeys.STATISTICS_THEME_COUNTER;
 	}
 
 	@Override

@@ -16,7 +16,7 @@ public class LanguageCounterConstructor extends AbstractCounterConstructor {
 
 	@Override
 	public String getCfgKey() {
-		return CfgKeys.RUN_LANGUAGES_COUNTER;
+		return CfgKeys.STATISTICS_LANGUAGES_COUNTER;
 	}
 
 	@Override

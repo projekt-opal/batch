@@ -6,6 +6,7 @@ import java.util.List;
 import org.dice_research.opal.batch.configuration.Cfg;
 import org.dice_research.opal.batch.construction.internal.DateFormatCounterConstructor;
 import org.dice_research.opal.batch.construction.internal.LanguageCounterConstructor;
+import org.dice_research.opal.batch.construction.internal.TitleLanguageCounterConstructor;
 import org.dice_research.opal.batch.construction.internal.InfoConstructor;
 import org.dice_research.opal.batch.construction.internal.ThemeCounterConstructor;
 import org.dice_research.opal.batch.construction.opal.CatfishConstructor;
@@ -34,9 +35,10 @@ public class ConstructorManager {
 
 		// Internal components
 
-		constructorManager.addConstructor(new LanguageCounterConstructor());
-		constructorManager.addConstructor(new ThemeCounterConstructor());
 		constructorManager.addConstructor(new DateFormatCounterConstructor());
+		constructorManager.addConstructor(new LanguageCounterConstructor());
+		constructorManager.addConstructor(new TitleLanguageCounterConstructor());
+		constructorManager.addConstructor(new ThemeCounterConstructor());
 
 		return constructorManager;
 	}

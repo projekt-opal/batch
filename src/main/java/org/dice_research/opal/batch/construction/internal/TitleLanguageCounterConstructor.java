@@ -13,7 +13,7 @@ import org.dice_research.opal.batch.configuration.CfgKeys;
 import org.dice_research.opal.batch.configuration.Filenames;
 import org.dice_research.opal.batch.construction.AbstractConstructor;
 import org.dice_research.opal.batch.construction.Constructor;
-import org.dice_research.opal.batch.model.DateFormatCounter;
+import org.dice_research.opal.batch.model.TitleLanguageCounter;
 import org.dice_research.opal.common.interfaces.ModelProcessor;
 
 /**
@@ -21,36 +21,31 @@ import org.dice_research.opal.common.interfaces.ModelProcessor;
  *
  * @author Adrian Wilke
  */
-public class DateFormatCounterConstructor extends AbstractConstructor {
+public class TitleLanguageCounterConstructor extends AbstractConstructor {
 
 	private static final Logger LOGGER = LogManager.getLogger();
 
-	private StringCounter datatypeCounter;
-	private StringCounter dateFormatCounter;
-	private StringCounter stringFormatCounter;
+	private StringCounter literalLanguageCounter;
+	private StringCounter germanEnglishCounter;
 
 	@Override
 	public boolean addModelProcessor(Cfg cfg, List<ModelProcessor> processors) {
-		return super.addModelProcessor(cfg, processors, CfgKeys.STATISTICS_DATE_COUNTER);
+		return super.addModelProcessor(cfg, processors, CfgKeys.STATISTICS_TITLE_LANGUAGES_COUNTER);
 	}
 
 	@Override
 	public ModelProcessor createModelProcessor(Cfg cfg) {
-		datatypeCounter = new StringCounter();
-		dateFormatCounter = new StringCounter();
-		stringFormatCounter = new StringCounter();
-		return new DateFormatCounter(datatypeCounter, dateFormatCounter, stringFormatCounter);
+		literalLanguageCounter = new StringCounter();
+		germanEnglishCounter = new StringCounter();
+		return new TitleLanguageCounter(literalLanguageCounter, germanEnglishCounter);
 	}
 
 	@Override
 	public Constructor finish(Cfg cfg) {
-
-		if (cfg.getBoolean(CfgKeys.STATISTICS_DATE_COUNTER)) {
-			write(datatypeCounter, Filenames.getFile(cfg, Filenames.DATE_TYPES));
-			write(dateFormatCounter, Filenames.getFile(cfg, Filenames.DATE_FORMATS));
-			write(stringFormatCounter, Filenames.getFile(cfg, Filenames.DATE_STRINGFORMATS));
+		if (cfg.getBoolean(CfgKeys.STATISTICS_TITLE_LANGUAGES_COUNTER)) {
+			write(literalLanguageCounter, Filenames.getFile(cfg, Filenames.TITLE_LANGUAGES));
+			write(germanEnglishCounter, Filenames.getFile(cfg, Filenames.TITLE_LANGUAGES_DE_EN));
 		}
-
 		return this;
 	}
 
@@ -66,7 +61,7 @@ public class DateFormatCounterConstructor extends AbstractConstructor {
 		try (FileOutputStream fos = new FileOutputStream(file)) {
 			fos.write(stringBuilder.toString().getBytes(StandardCharsets.UTF_8));
 		} catch (Exception e) {
-			LOGGER.error("Error on writing date types counter", e);
+			LOGGER.error("Error on writing literal languages counter", e);
 		}
 	}
 

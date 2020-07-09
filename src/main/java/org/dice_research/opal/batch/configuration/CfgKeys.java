@@ -22,10 +22,6 @@ public abstract class CfgKeys {
 	public static final String RUN_GEO = "run.geoData";
 	public static final String RUN_CIVET = "run.civet";
 
-	public static final String RUN_THEME_COUNTER = "run.themes";
-	public static final String RUN_LANGUAGES_COUNTER = "run.languages";
-	public static final String RUN_DATE_COUNTER = "run.dates";
-
 	public static final String CATFISH_EMPTY_BLANK_NODES = "catfish.cleanEmptyBlankNodes";
 	public static final String CATFISH_LITERALS = "catfish.cleanLiterals";
 	public static final String CATFISH_FORMATS = "catfish.cleanFormats";
@@ -38,5 +34,10 @@ public abstract class CfgKeys {
 	public static final String CIVET_REMOVE_MEASUREMENTS = "civet.removeMeasurements";
 
 	public static final String ADD_LABELS = "add.labels";
+
+	public static final String STATISTICS_DATE_COUNTER = "statistics.dates";
+	public static final String STATISTICS_LANGUAGES_COUNTER = "statistics.languages";
+	public static final String STATISTICS_THEME_COUNTER = "statistics.themes";
+	public static final String STATISTICS_TITLE_LANGUAGES_COUNTER = "statistics.titleLanguages";
 
 }

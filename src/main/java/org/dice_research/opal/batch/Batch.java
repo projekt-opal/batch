@@ -90,7 +90,7 @@ public class Batch {
 		checkInput(cfg);
 		checkOutput(cfg);
 		modelProcessors = constructorManager.createModelProcessors(cfg).getModelProcessors();
-		setRdfWriter();
+		setRdfWriter(cfg);
 
 		// Read and process data
 		for (File input : inputs) {
@@ -251,9 +251,9 @@ public class Batch {
 	/**
 	 * Sets the RDF-writer to use.
 	 */
-	private RdfWriter setRdfWriter() {
+	private RdfWriter setRdfWriter(Cfg cfg) {
 		rdfWriter = null;
-		if (outputDirectory != null) {
+		if (cfg.getBoolean(CfgKeys.IO_OUTPUT_WRITE)) {
 			RdfFileWriter rdfFileWriter = new RdfFileWriter();
 			rdfFileWriter.directory = outputDirectory;
 			rdfFileWriter.title = outputTitle;

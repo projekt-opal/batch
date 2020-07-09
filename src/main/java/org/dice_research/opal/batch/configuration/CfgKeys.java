@@ -16,6 +16,7 @@ public abstract class CfgKeys {
 	public static final String IO_OUTPUT_TITLE = "io.outputTitle";
 	public static final String IO_OUTPUT_FORMAT = "io.outputFormat";
 	public static final String IO_OUTPUT_SIZE = "io.outputSize";
+	public static final String IO_OUTPUT_WRITE = "io.outputWrite";
 
 	public static final String RUN_CATFISH = "run.catfish";
 	public static final String RUN_LANG = "run.languageDetection";

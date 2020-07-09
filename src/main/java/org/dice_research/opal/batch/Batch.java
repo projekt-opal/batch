@@ -273,7 +273,7 @@ public class Batch {
 		if (cfg.getBoolean(CfgKeys.ADD_LABELS)) {
 			try {
 				IOUtils.copy(getClass().getResourceAsStream("opal-themes-labels.ttl"),
-						new FileOutputStream(new File(outputDirectory, Filenames.LANGUAGES)));
+						new FileOutputStream(new File(outputDirectory, Filenames.LABELS_THEMES)));
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}

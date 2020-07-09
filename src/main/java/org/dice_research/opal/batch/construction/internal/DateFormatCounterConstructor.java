@@ -46,15 +46,15 @@ public class DateFormatCounterConstructor extends AbstractConstructor {
 	public Constructor finish(Cfg cfg) {
 
 		if (cfg.getBoolean(CfgKeys.RUN_DATE_COUNTER)) {
-			write(datatypeCounter, cfg.get(CfgKeys.IO_OUTPUT_DIRECTORY), Filenames.DATETYPES);
-			write(dateFormatCounter, cfg.get(CfgKeys.IO_OUTPUT_DIRECTORY), Filenames.DATEFORMATS);
-			write(stringFormatCounter, cfg.get(CfgKeys.IO_OUTPUT_DIRECTORY), Filenames.DATESTRINGFORMATS);
+			write(datatypeCounter, Filenames.getFile(cfg, Filenames.DATETYPES));
+			write(dateFormatCounter, Filenames.getFile(cfg, Filenames.DATEFORMATS));
+			write(stringFormatCounter, Filenames.getFile(cfg, Filenames.DATESTRINGFORMATS));
 		}
 
 		return this;
 	}
 
-	private void write(StringCounter stringCounter, String directory, String filename) {
+	private void write(StringCounter stringCounter, File file) {
 		StringBuilder stringBuilder = new StringBuilder();
 		for (Entry<String, Long> entry : stringCounter.getCounterSortedByValue().entrySet()) {
 			stringBuilder.append(entry.getValue());
@@ -63,7 +63,6 @@ public class DateFormatCounterConstructor extends AbstractConstructor {
 			stringBuilder.append(System.lineSeparator());
 		}
 
-		File file = new File(directory, filename);
 		try (FileOutputStream fos = new FileOutputStream(file)) {
 			fos.write(stringBuilder.toString().getBytes(StandardCharsets.UTF_8));
 		} catch (Exception e) {

@@ -7,6 +7,7 @@ import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.TreeSet;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -68,5 +69,26 @@ public class Cfg {
 	public Cfg set(String key, String value) {
 		properties.setProperty(key, value);
 		return this;
+	}
+
+	@Override
+	public String toString() {
+		int maxlength = 0;
+		for (Object key : properties.keySet()) {
+			if (key.toString().length() > maxlength) {
+				maxlength = key.toString().length();
+			}
+		}
+
+		StringBuilder stringBuilder = new StringBuilder();
+		for (Object key : new TreeSet<>(properties.keySet())) {
+			stringBuilder.append(key.toString());
+			for (int i = 0; i <= maxlength - key.toString().length(); i++) {
+				stringBuilder.append(" ");
+			}
+			stringBuilder.append(properties.get(key));
+			stringBuilder.append(System.lineSeparator());
+		}
+		return stringBuilder.toString();
 	}
 }

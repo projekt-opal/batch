@@ -18,6 +18,7 @@ import org.apache.logging.log4j.Logger;
 import org.dice_research.opal.batch.configuration.Cfg;
 import org.dice_research.opal.batch.configuration.CfgException;
 import org.dice_research.opal.batch.configuration.CfgKeys;
+import org.dice_research.opal.batch.configuration.Filenames;
 import org.dice_research.opal.batch.construction.Constructor;
 import org.dice_research.opal.batch.construction.ConstructorManager;
 import org.dice_research.opal.batch.construction.opal.CatfishConstructor;
@@ -272,7 +273,7 @@ public class Batch {
 		if (cfg.getBoolean(CfgKeys.ADD_LABELS)) {
 			try {
 				IOUtils.copy(getClass().getResourceAsStream("opal-themes-labels.ttl"),
-						new FileOutputStream(new File(outputDirectory, "opal-themes-labels.ttl")));
+						new FileOutputStream(new File(outputDirectory, Filenames.LANGUAGES)));
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}

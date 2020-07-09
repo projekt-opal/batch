@@ -1,6 +1,9 @@
 package org.dice_research.opal.batch.construction.internal;
 
+import java.io.File;
+
 import org.apache.jena.vocabulary.DCTerms;
+import org.dice_research.opal.batch.configuration.Cfg;
 import org.dice_research.opal.batch.configuration.CfgKeys;
 import org.dice_research.opal.batch.configuration.Filenames;
 
@@ -22,8 +25,8 @@ public class LanguageCounterConstructor extends AbstractCounterConstructor {
 	}
 
 	@Override
-	public String getFilename() {
-		return Filenames.LANGUAGES;
+	public File getFile(Cfg cfg) {
+		return Filenames.getFile(cfg, Filenames.LANGUAGES);
 	}
 
 }

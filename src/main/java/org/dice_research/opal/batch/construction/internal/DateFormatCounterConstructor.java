@@ -13,7 +13,7 @@ import org.dice_research.opal.batch.configuration.CfgKeys;
 import org.dice_research.opal.batch.configuration.Filenames;
 import org.dice_research.opal.batch.construction.AbstractConstructor;
 import org.dice_research.opal.batch.construction.Constructor;
-import org.dice_research.opal.batch.model.DateFormatCounter;
+import org.dice_research.opal.batch.processor.DateFormatCounter;
 import org.dice_research.opal.common.interfaces.ModelProcessor;
 
 /**

@@ -24,6 +24,8 @@ public abstract class CfgKeys {
 	public static final String RUN_CIVET = "run.civet";
 
 	public static final String CATFISH_EMPTY_BLANK_NODES = "catfish.cleanEmptyBlankNodes";
+	public static final String CATFISH_REMOVE_NON_DE__EN_EMPTY_TITLES = "catfish.removeNonDeEnEmptyTitles";
+	public static final String CATFISH_REMOVE_NON_DE_EN = "catfish.removeNonDeEn";
 	public static final String CATFISH_LITERALS = "catfish.cleanLiterals";
 	public static final String CATFISH_FORMATS = "catfish.cleanFormats";
 	public static final String CATFISH_EQUALIZE_DATES = "catfish.equalizeDateFormats";
@@ -41,4 +43,6 @@ public abstract class CfgKeys {
 	public static final String STATISTICS_THEME_COUNTER = "statistics.themes";
 	public static final String STATISTICS_TITLE_LANGUAGES_COUNTER = "statistics.titleLanguages";
 
+	public static final String INTERNAL_WRITTEN_MODELS = "internal.writtenModels";
+	public static final String INTERNAL_WRITTEN_TRIPLES = "internal.writtenTriples";
 }

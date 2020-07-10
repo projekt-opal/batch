@@ -52,7 +52,7 @@ public class CatfishConstructor extends AbstractConstructor {
 
 		if (catalogId == null) {
 			throw new RuntimeException(
-					"Please ensure the file name " + file.getName() + " contains only one entry of " + getCatalogIds());
+					"Please ensure the file name " + file.getName() + " contains one entry of " + getCatalogIds());
 		}
 
 		return catalogId;
@@ -71,6 +71,14 @@ public class CatfishConstructor extends AbstractConstructor {
 				// (optional method call, default: true)
 				.setCleanEmptyBlankNodes(cfg.getBoolean(CfgKeys.CATFISH_EMPTY_BLANK_NODES))
 
+				// Removes literals, which are not empty, german or english
+				.setRemoveNonDeEnEmptyTitleLiterals(cfg.getBoolean(CfgKeys.CATFISH_REMOVE_NON_DE__EN_EMPTY_TITLES))
+
+				// Removes datasets, which do not have a german and an english title.
+				// Additionally, non-german and non-english titles and descriptions are removed.
+				// (optional method call, default: false)
+				.setRemoveNonDeEnTitleDatasets(cfg.getBoolean(CfgKeys.CATFISH_REMOVE_NON_DE_EN))
+
 				// Remove triples with literals as object, which contain no value or unreadable.
 				// And also extract Language Tag and DataType if it is mistakenly inside the
 				// string
@@ -84,7 +92,7 @@ public class CatfishConstructor extends AbstractConstructor {
 				// Rewrites date formats
 				// (optional method call, default: false)
 				.setEqualizeDateFormats(cfg.getBoolean(CfgKeys.CATFISH_EQUALIZE_DATES));
-
+		
 		// Rewrites URIs of datasets and distributions
 		// Catalogs are listed at opal.common.constants.Catalogs
 		// (optional method call, default: null)

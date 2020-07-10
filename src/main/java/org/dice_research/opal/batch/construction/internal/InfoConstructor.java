@@ -19,7 +19,7 @@ import org.dice_research.opal.batch.configuration.CfgKeys;
 import org.dice_research.opal.batch.configuration.Filenames;
 import org.dice_research.opal.batch.construction.AbstractConstructor;
 import org.dice_research.opal.batch.construction.Constructor;
-import org.dice_research.opal.batch.model.ModelTripleCounter;
+import org.dice_research.opal.batch.processor.ModelTripleCounter;
 import org.dice_research.opal.common.interfaces.ModelProcessor;
 
 public class InfoConstructor extends AbstractConstructor {
@@ -46,6 +46,7 @@ public class InfoConstructor extends AbstractConstructor {
 	@Override
 	public Constructor finish(Cfg cfg) {
 		endTime = System.currentTimeMillis();
+		float runSeconds = 1f * (endTime - startTime) / 1000;
 
 		StringBuilder stringBuilder = new StringBuilder();
 		if (cfg.has(CfgKeys.INFO)) {
@@ -56,15 +57,29 @@ public class InfoConstructor extends AbstractConstructor {
 		}
 		stringBuilder.append("Start:               " + new Date(startTime).toString());
 		stringBuilder.append(System.lineSeparator());
-		stringBuilder.append("Runtime (seconds):   " + 1f * (endTime - startTime) / 1000);
+		stringBuilder.append("Runtime (seconds):   " + runSeconds);
 		stringBuilder.append(System.lineSeparator());
 		stringBuilder.append(System.lineSeparator());
 
 		stringBuilder.append("Processed datasets:  " + modelTripleCounter.models);
 		stringBuilder.append(System.lineSeparator());
-		stringBuilder.append("Datasets per second: " + 1f * modelTripleCounter.models / ((endTime - startTime) / 1000));
+		stringBuilder.append("Datasets per second: " + 1f * modelTripleCounter.models / runSeconds);
 		stringBuilder.append(System.lineSeparator());
 		stringBuilder.append("Processed triples:   " + modelTripleCounter.triples);
+		stringBuilder.append(System.lineSeparator());
+		stringBuilder.append("Triples per dataset: " + 1f * modelTripleCounter.triples / modelTripleCounter.models);
+		stringBuilder.append(System.lineSeparator());
+		stringBuilder.append(System.lineSeparator());
+
+		long writtenModels = cfg.getLong(CfgKeys.INTERNAL_WRITTEN_MODELS);
+		long writtenTriples = cfg.getLong(CfgKeys.INTERNAL_WRITTEN_TRIPLES);
+		stringBuilder.append("Written datasets:    " + writtenModels);
+		stringBuilder.append(System.lineSeparator());
+		stringBuilder.append("Datasets per second: " + 1f * writtenModels / runSeconds);
+		stringBuilder.append(System.lineSeparator());
+		stringBuilder.append("Written triples:     " + writtenTriples);
+		stringBuilder.append(System.lineSeparator());
+		stringBuilder.append("Triples per dataset: " + 1f * writtenTriples / writtenModels);
 		stringBuilder.append(System.lineSeparator());
 		stringBuilder.append(System.lineSeparator());
 

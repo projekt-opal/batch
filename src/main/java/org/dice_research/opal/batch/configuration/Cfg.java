@@ -50,6 +50,10 @@ public class Cfg {
 		return Boolean.parseBoolean(properties.getProperty(key).trim());
 	}
 
+	public long getLong(String key) {
+		return Long.parseLong(properties.getProperty(key).trim());
+	}
+
 	public List<String> getKeys(String prefix) {
 		List<String> keys = new LinkedList<>();
 		Enumeration<?> propertyNames = properties.propertyNames();

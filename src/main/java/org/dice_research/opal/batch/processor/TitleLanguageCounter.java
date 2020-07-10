@@ -1,4 +1,4 @@
-package org.dice_research.opal.batch.model;
+package org.dice_research.opal.batch.processor;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.Property;

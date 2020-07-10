@@ -25,9 +25,11 @@ import org.dice_research.opal.batch.construction.opal.CatfishConstructor;
 import org.dice_research.opal.batch.reader.RdfFileReader;
 import org.dice_research.opal.batch.reader.RdfReaderResult;
 import org.dice_research.opal.batch.writer.DummyWriter;
-import org.dice_research.opal.batch.writer.RdfFileWriter;
+import org.dice_research.opal.batch.writer.OutputInfo;
+import org.dice_research.opal.batch.writer.RdfFileBufferWriter;
 import org.dice_research.opal.batch.writer.RdfWriter;
 import org.dice_research.opal.catfish.Catfish;
+import org.dice_research.opal.catfish.checker.DistributionAccessChecker;
 import org.dice_research.opal.common.interfaces.ModelProcessor;
 
 /**
@@ -73,6 +75,7 @@ public class Batch {
 
 	private RdfWriter rdfWriter;
 	private List<ModelProcessor> modelProcessors;
+	private OutputInfo outputInfo = new OutputInfo();
 
 	/**
 	 * Executes batch with given configuration and default constructors.
@@ -103,6 +106,8 @@ public class Batch {
 
 		// Finalize
 		rdfWriter.finish();
+		cfg.set(CfgKeys.INTERNAL_WRITTEN_MODELS, Long.valueOf(outputInfo.writtenModels).toString());
+		cfg.set(CfgKeys.INTERNAL_WRITTEN_TRIPLES, Long.valueOf(outputInfo.writtenTriples).toString());
 		for (Constructor constructor : constructorManager.getConstructors()) {
 			constructor.finish(cfg);
 		}
@@ -208,33 +213,55 @@ public class Batch {
 	 * Processes file and calls {@link #processModel(Model, String)}.
 	 */
 	private void processFile(File inputFile) throws Exception {
+
+		// Configure reader
 		RdfFileReader rdfFileReader = new RdfFileReader().setFile(inputFile);
 		if (inputGraph != null) {
 			rdfFileReader.setGraphName(inputGraph);
 		}
 
+		// Read, process, write
 		while (rdfFileReader.hasNext()) {
 			RdfReaderResult result = rdfFileReader.next();
-			processModel(result.getModel(), result.getDatasetUri());
+			String datasetUri = result.getDatasetUri();
+
+			// Check if dataset should be processed
+			if (!new DistributionAccessChecker().checkModel(result.getModel(), datasetUri)) {
+				continue;
+			}
+
+			datasetUri = processModel(result.getModel(), result.getDatasetUri());
+
+			// Check if dataset should be written
+			if (!new DistributionAccessChecker().checkModel(result.getModel(), datasetUri)) {
+				continue;
+			}
+
 			rdfWriter.write(result.getModel());
+			outputInfo.writtenModels++;
+			outputInfo.writtenTriples += result.getModel().size();
 		}
 	}
 
 	/**
 	 * Processes model.
 	 */
-	private void processModel(Model model, String datasetUri) throws Exception {
-		for (ModelProcessor modelProcessor : modelProcessors) {
-			modelProcessor.processModel(model, datasetUri);
+	private String processModel(Model model, String datasetUri) throws Exception {
 
-			// Go on with rewritten dataset URI
+		String currentDatasetUri = datasetUri;
+
+		for (ModelProcessor modelProcessor : modelProcessors) {
+			modelProcessor.processModel(model, currentDatasetUri);
+
 			if (modelProcessor instanceof Catfish) {
-				String newDatasetUri = ((Catfish) modelProcessor).getNewDatasetUri();
-				if (newDatasetUri != null) {
-					datasetUri = newDatasetUri;
+				if (((Catfish) modelProcessor).getNewDatasetUri() != null) {
+					currentDatasetUri = ((Catfish) modelProcessor).getNewDatasetUri();
 				}
 			}
+
 		}
+
+		return currentDatasetUri;
 	}
 
 	/**
@@ -254,7 +281,12 @@ public class Batch {
 	private RdfWriter setRdfWriter(Cfg cfg) {
 		rdfWriter = null;
 		if (cfg.getBoolean(CfgKeys.IO_OUTPUT_WRITE)) {
-			RdfFileWriter rdfFileWriter = new RdfFileWriter();
+
+			// RdfFileWriter currently replaced by RdfFileBufferWriter
+			// RdfFileWriter rdfFileWriter = new RdfFileWriter();
+
+			RdfFileBufferWriter rdfFileWriter = new RdfFileBufferWriter();
+
 			rdfFileWriter.directory = outputDirectory;
 			rdfFileWriter.title = outputTitle;
 			rdfFileWriter.lang = outputLanguage;

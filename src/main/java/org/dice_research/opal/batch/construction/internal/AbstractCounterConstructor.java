@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.dice_research.opal.batch.configuration.Cfg;
 import org.dice_research.opal.batch.construction.AbstractConstructor;
 import org.dice_research.opal.batch.construction.Constructor;
-import org.dice_research.opal.batch.model.PropertyCounter;
+import org.dice_research.opal.batch.processor.PropertyCounter;
 import org.dice_research.opal.common.interfaces.ModelProcessor;
 
 /**

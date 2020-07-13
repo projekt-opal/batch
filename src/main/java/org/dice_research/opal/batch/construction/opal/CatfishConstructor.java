@@ -39,6 +39,8 @@ public class CatfishConstructor extends AbstractConstructor {
 
 	public static String getCatalogId(File file) {
 		String catalogId = null;
+
+		// Check file
 		for (String catalog : getCatalogIds()) {
 			if (file.getName().contains(catalog)) {
 				if (catalogId == null) {
@@ -46,6 +48,20 @@ public class CatfishConstructor extends AbstractConstructor {
 				} else {
 					throw new CfgException(
 							"The input " + file.getName() + " contains multiple entries of " + getCatalogIds());
+				}
+			}
+		}
+
+		// Check whole path
+		if (catalogId == null) {
+			for (String catalog : getCatalogIds()) {
+				if (file.getAbsolutePath().contains(catalog)) {
+					if (catalogId == null) {
+						catalogId = catalog;
+					} else {
+						throw new CfgException(
+								"The input " + file.getName() + " contains multiple entries of " + getCatalogIds());
+					}
 				}
 			}
 		}
@@ -92,7 +108,7 @@ public class CatfishConstructor extends AbstractConstructor {
 				// Rewrites date formats
 				// (optional method call, default: false)
 				.setEqualizeDateFormats(cfg.getBoolean(CfgKeys.CATFISH_EQUALIZE_DATES));
-		
+
 		// Rewrites URIs of datasets and distributions
 		// Catalogs are listed at opal.common.constants.Catalogs
 		// (optional method call, default: null)

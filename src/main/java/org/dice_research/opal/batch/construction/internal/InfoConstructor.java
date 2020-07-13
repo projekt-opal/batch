@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 import java.util.jar.Manifest;
 
 import org.apache.logging.log4j.LogManager;
@@ -103,7 +104,7 @@ public class InfoConstructor extends AbstractConstructor {
 	}
 
 	private String getVersionNameFromManifest() {
-		// TODO: Not tested
+		// TODO: Not successfully tested
 		// https://www.triology.de/blog/versionsnamen-mit-maven-auslesen-des-versionsnamens
 		InputStream manifestStream = getClass().getClassLoader().getResourceAsStream("META-INF/MANIFEST.MF");
 		if (manifestStream != null) {
@@ -118,6 +119,7 @@ public class InfoConstructor extends AbstractConstructor {
 	}
 
 	private String getVersionName() {
+		// Directly read pom.xml
 		// https://stackoverflow.com/a/41791885
 		if ((new File("pom.xml")).exists()) {
 			try {
@@ -125,7 +127,21 @@ public class InfoConstructor extends AbstractConstructor {
 			} catch (IOException | XmlPullParserException e) {
 				return "unknown";
 			}
-		} else {
+		}
+
+		// Use resource in Multi-Release Jar
+		else {
+			try {
+				Properties properties = new Properties();
+				properties.load(getClass().getClassLoader()
+						.getResourceAsStream("META-INF/maven/org.dice-research.opal/batch/pom.properties"));
+				if (properties.containsKey("version")) {
+					return properties.getProperty("version");
+				}
+			} catch (Exception e) {
+				// Ignore and try next approach
+			}
+
 			return getVersionNameFromManifest();
 		}
 	}

@@ -6,7 +6,8 @@
 	<name>OPAL batch</name>
 	<groupId>org.dice-research.opal</groupId>
 	<artifactId>batch</artifactId>
-	<version>0.0.4-SNAPSHOT</version>
+	<version>1.0.0</version>
+<!-- 	<version>0.0.4-SNAPSHOT</version> -->
 
 	<properties>
 		<java.version>1.8</java.version>

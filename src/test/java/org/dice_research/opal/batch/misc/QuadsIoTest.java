@@ -1,4 +1,4 @@
-package misc;
+package org.dice_research.opal.batch.misc;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,7 +19,7 @@ import org.junit.Assume;
 import org.junit.Test;
 
 /**
- * Tests reading N-Quads.
+ * Tests reading N-Quads using Apache Jena.
  * 
  * Maybe an alternative:
  * https://github.com/SmartDataAnalytics/SparqlIntegrate/blob/21417cfe7b4f6ce1fe9cd79825f774f231f829d4/README-NGS.md
@@ -27,7 +27,7 @@ import org.junit.Test;
  * @author Adrian Wilke
  */
 public class QuadsIoTest {
-	
+
 	private static final boolean SKIP_TEST = true;
 
 	/**

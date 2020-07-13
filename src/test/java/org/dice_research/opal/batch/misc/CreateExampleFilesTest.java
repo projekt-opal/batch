@@ -1,4 +1,4 @@
-package misc;
+package org.dice_research.opal.batch.misc;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -18,15 +18,18 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFLanguages;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dice_research.opal.batch.TestFiles;
+import org.dice_research.opal.batch.utils.TestFiles;
 import org.dice_research.opal.test_cases.OpalTestCases;
 import org.junit.Assume;
 import org.junit.Test;
 
 /**
- * This test extracts DCAT date formats.
+ * Creates test resources in src/test/resources.
  * 
- * Usage: Specify input source (optional: and input graph) in {@link #test()}.
+ * Execution is only required to create new test resources.
+ * 
+ * Usage: Set {@link #SKIP_TEST} to false and edit {@link #test()}. Afterwards,
+ * edit {@link TestFiles}.
  *
  * @author Adrian Wilke
  */

@@ -1,4 +1,4 @@
-package org.dice_research.opal.batch;
+package org.dice_research.opal.batch.utils;
 
 import java.io.File;
 import java.util.Arrays;

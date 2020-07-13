@@ -1,13 +1,15 @@
-import org.dice_research.opal.batch.ReadWriteTest;
+package org.dice_research.opal.batch;
+
+import org.dice_research.opal.batch.misc.CreateExampleFilesTest;
+import org.dice_research.opal.batch.misc.QuadsIoTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import misc.CreateExampleFilesTest;
-import misc.QuadsIoTest;
-
 @RunWith(Suite.class)
 @SuiteClasses({
+
+		CountDistributionsTest.class,
 
 		ReadWriteTest.class,
 

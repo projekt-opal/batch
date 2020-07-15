@@ -1,18 +1,13 @@
 package org.dice_research.opal.batch.writer;
 
-import org.apache.jena.rdf.model.Model;
+import org.dice_research.opal.common.interfaces.ModelProcessor;
 
 /**
  * Interface for writing RDF resources.
  *
  * @author Adrian Wilke
  */
-public interface RdfWriter {
-
-	/**
-	 * Writes the given model.
-	 */
-	RdfWriter write(Model model);
+public interface RdfWriter extends ModelProcessor {
 
 	/**
 	 * For finalizing readers, e.g. closing.

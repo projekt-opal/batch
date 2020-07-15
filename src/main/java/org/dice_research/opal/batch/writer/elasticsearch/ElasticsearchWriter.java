@@ -23,17 +23,18 @@ import org.elasticsearch.client.RestHighLevelClient;
 public class ElasticsearchWriter implements RdfWriter {
 
 	private RestHighLevelClient restHighLevelClient;
+	private Parser parser = new Parser();
 
 	@Override
-	public RdfWriter write(Model model) {
-		// TODO Auto-generated method stub
-		return null;
+	public void processModel(Model model, String datasetUri) throws Exception {
+		parser.processModel(model, datasetUri);
+		System.out.println(parser.getDataset());
+
 	}
 
 	@Override
 	public RdfWriter finish() {
-		// TODO Auto-generated method stub
-		return null;
+		return this;
 	}
 
 }

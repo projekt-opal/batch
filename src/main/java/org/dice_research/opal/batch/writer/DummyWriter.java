@@ -5,13 +5,12 @@ import org.apache.jena.rdf.model.Model;
 public class DummyWriter implements RdfWriter {
 
 	@Override
-	public RdfWriter write(Model model) {
+	public RdfWriter finish() {
 		return this;
 	}
 
 	@Override
-	public RdfWriter finish() {
-		return this;
+	public void processModel(Model model, String datasetUri) throws Exception {
 	}
 
 }

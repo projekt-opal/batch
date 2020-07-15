@@ -5,16 +5,21 @@ import java.util.List;
 
 public class Distribution {
 
-	private String uri;
-	private List<String> originalUrls = new LinkedList<>();
-	private String title;
-	private String description;
-	private String issued;
-	private String modified;
-	private String license; // TODO
-	private String accessUrl;
-	private String downloadUrl;
-	private String format;
-	private long byteSize;
-	private List<String> rights = new LinkedList<>();
+	public String uri;
+	public List<String> originalUrls = new LinkedList<>();
+	public String title;
+	public String description;
+	public String issued;
+	public String modified;
+	public String license; // TODO
+	public String accessUrl;
+	public String downloadUrl;
+	public String format;
+	public long byteSize;
+	public List<String> rights = new LinkedList<>();
+
+	public void appendString(StringBuilder stringBuilder) {
+		stringBuilder.append(uri);
+		stringBuilder.append(System.lineSeparator());
+	}
 }

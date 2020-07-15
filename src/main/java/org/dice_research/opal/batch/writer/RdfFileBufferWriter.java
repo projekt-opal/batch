@@ -32,7 +32,9 @@ public class RdfFileBufferWriter implements RdfWriter {
 	private int fileCounter = 1;
 
 	@Override
-	public RdfWriter write(Model model) {
+	public void processModel(Model model, String datasetUri) throws Exception {
+
+		// TODO ignores datasetUri
 
 		if (exportModel == null) {
 			file = new File(directory, title + "-" + fileCounter + "." + lang.getFileExtensions().get(0));
@@ -60,8 +62,6 @@ public class RdfFileBufferWriter implements RdfWriter {
 		if (modelCounter == maxModels) {
 			finish();
 		}
-
-		return this;
 	}
 
 	@Override

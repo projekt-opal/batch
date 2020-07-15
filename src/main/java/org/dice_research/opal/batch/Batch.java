@@ -237,7 +237,7 @@ public class Batch {
 				continue;
 			}
 
-			rdfWriter.write(result.getModel());
+			rdfWriter.processModel(result.getModel(), result.getDatasetUri());
 			outputInfo.writtenModels++;
 			outputInfo.writtenTriples += result.getModel().size();
 		}

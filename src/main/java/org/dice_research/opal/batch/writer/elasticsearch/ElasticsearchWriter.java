@@ -18,6 +18,7 @@ private JsonExtractor jsonExtractor = new JsonExtractor();
 
 	@Override
 	public void processModel(Model model, String datasetUri) throws Exception {
+		System.out.println("ElasticsearchWriter");
 		jsonExtractor.processModel(model, datasetUri);
 
 		model.write(System.out, "TTL");

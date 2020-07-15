@@ -12,6 +12,7 @@ import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.DCAT;
 import org.apache.jena.vocabulary.DCTerms;
 import org.apache.logging.log4j.LogManager;
@@ -24,8 +25,8 @@ import org.json.JSONObject;
 /**
  * Extracts data from model and creates a JSON object.
  * 
- * Usage: Create one {@link JsonExtractor} instance for each execution. After calling
- * {@link #processModel(Model, String)}, the result is available via
+ * Usage: Create one {@link JsonExtractor} instance for each execution. After
+ * calling {@link #processModel(Model, String)}, the result is available via
  * {@link #getJsonObject()}.
  * 
  * Based on these Elasticsearch mappings:
@@ -68,29 +69,26 @@ public class JsonExtractor implements ModelProcessor {
 	private JSONObject processDataset(Resource dataset) {
 
 		jsonObject.put("uri", dataset.getURI());
-		appendToJson(dataset, Opal.PROP_ORIGINAL_URI, jsonObject, "originalUrls");
-		appendToJson(dataset, DCTerms.title, jsonObject, "title");
-		appendLiteralsToJson(dataset, DCTerms.title, jsonObject, "title", new String[] { "", "en" }, false);
-		appendLiteralsToJson(dataset, DCTerms.title, jsonObject, "title_de", new String[] { "de" }, false);
-		appendLiteralsToJson(dataset, DCTerms.description, jsonObject, "description", new String[] { "", "en" }, false);
-		appendLiteralsToJson(dataset, DCTerms.description, jsonObject, "description_de", new String[] { "de" }, false);
-		appendToJson(dataset, DCAT.landingPage, jsonObject, "landingPage");
-		appendLiteralsToJson(dataset, DCTerms.language, jsonObject, "language", null, true);
-//		appendToJson(dataset, DCTerms.language, jsonObject, "language");
-		appendLiteralsToJson(dataset, DCAT.keyword, jsonObject, "keywords", new String[] { "", "en" }, true);
-		appendLiteralsToJson(dataset, DCAT.keyword, jsonObject, "keywords_de", new String[] { "", "en" }, true);
-		appendToJson(dataset, DCTerms.issued, jsonObject, "issued");
-		appendToJson(dataset, DCTerms.modified, jsonObject, "modified");
+		add(dataset, Opal.PROP_ORIGINAL_URI, jsonObject, "originalUrls");
+		addLiterals(dataset, DCTerms.title, jsonObject, "title", new String[] { "", "en" }, false);
+		addLiterals(dataset, DCTerms.title, jsonObject, "title_de", new String[] { "de" }, false);
+		addLiterals(dataset, DCTerms.description, jsonObject, "description", new String[] { "", "en" }, false);
+		addLiterals(dataset, DCTerms.description, jsonObject, "description_de", new String[] { "de" }, false);
+		add(dataset, DCAT.landingPage, jsonObject, "landingPage");
+		addLiterals(dataset, DCTerms.language, jsonObject, "language", new String[] {}, true);
+		addLiterals(dataset, DCAT.keyword, jsonObject, "keywords", new String[] { "", "en" }, true);
+		addLiterals(dataset, DCAT.keyword, jsonObject, "keywords_de", new String[] { "", "en" }, true);
+		add(dataset, DCTerms.issued, jsonObject, "issued");
+		add(dataset, DCTerms.modified, jsonObject, "modified");
 //		public List<String> licenses; // TODO
 //		public List<String> themes;// TODO
 //		public List<String> hasQualityMeasurements; // TODO
-//		appendToJson(dataset, null, jsonObject, "publisher");
-//		appendToJson(dataset, null, jsonObject, "creator");
-		appendToJson(dataset, DCTerms.spatial, jsonObject, "spatial");
+		addPublisher(dataset, DCTerms.creator, jsonObject, "creator");
+		addPublisher(dataset, DCTerms.publisher, jsonObject, "publisher");
+		add(dataset, DCTerms.spatial, jsonObject, "spatial");
 //		appendToJson(dataset, null, jsonObject, "contactPoint");
-//		public List<Distribution> distributions; // TODO
-		appendToJson(dataset, DCTerms.accrualPeriodicity, jsonObject, "accrualPeriodicity");
-		appendToJson(dataset, DCTerms.identifier, jsonObject, "dcatIdentifier");
+		add(dataset, DCTerms.accrualPeriodicity, jsonObject, "accrualPeriodicity");
+		add(dataset, DCTerms.identifier, jsonObject, "dcatIdentifier");
 //		appendToJson(dataset, null, jsonObject, "temporal");
 
 		JSONArray distributions = new JSONArray();
@@ -110,22 +108,22 @@ public class JsonExtractor implements ModelProcessor {
 		jsonObject.put("dataSetUri", distribution.getURI());
 
 		// TODO not in test data
-		appendToJson(distribution, Opal.PROP_ORIGINAL_URI, jsonObject, "originalUrl");
+		add(distribution, Opal.PROP_ORIGINAL_URI, jsonObject, "originalUrl");
 
-		appendToJson(distribution, DCTerms.title, jsonObject, "title");
-		appendToJson(distribution, DCTerms.description, jsonObject, "description");
-		appendToJson(distribution, DCTerms.issued, jsonObject, "issued");
-		appendToJson(distribution, DCTerms.modified, jsonObject, "modified");
+		add(distribution, DCTerms.title, jsonObject, "title");
+		add(distribution, DCTerms.description, jsonObject, "description");
+		add(distribution, DCTerms.issued, jsonObject, "issued");
+		add(distribution, DCTerms.modified, jsonObject, "modified");
 
 		// TODO DCTerms.license
 
-		appendToJson(distribution, DCAT.accessURL, jsonObject, "accessUrl");
-		appendToJson(distribution, DCAT.downloadURL, jsonObject, "downloadUrl");
+		add(distribution, DCAT.accessURL, jsonObject, "accessUrl");
+		add(distribution, DCAT.downloadURL, jsonObject, "downloadUrl");
 
 		// TODO use cleaned
-		appendToJson(distribution, DCTerms.format, jsonObject, "format");
+		add(distribution, DCTerms.format, jsonObject, "format");
 
-		appendToJson(distribution, DCAT.byteSize, jsonObject, "byteSize");
+		add(distribution, DCAT.byteSize, jsonObject, "byteSize");
 
 		distributions.put(jsonObject);
 
@@ -141,44 +139,12 @@ public class JsonExtractor implements ModelProcessor {
 	}
 
 	/**
-	 * Appends a literal value to JSON.
-	 * 
-	 * @param languages      can be an array of languages or null to match any
-	 *                       language
-	 * @param multipleValues true, if multiple values can be added. False, if only
-	 *                       one value should be added.
-	 */
-	private void appendLiteralsToJson(Resource resource, Property property, JSONObject jsonObject, String jsonKey,
-			String[] languages, boolean multipleValues) {
-		StmtIterator stmtIterator = resource.listProperties(property);
-		while (stmtIterator.hasNext()) {
-			RDFNode rdfNode = stmtIterator.next().getObject();
-
-			if (rdfNode.isLiteral()) {
-				String language = rdfNode.asLiteral().getLanguage();
-				if (languages == null || Arrays.asList(languages).contains(language)) {
-					String value = rdfNode.asLiteral().getString().trim();
-					if (!value.isEmpty()) {
-						jsonObject.append(jsonKey, value);
-						if (!multipleValues) {
-							return;
-						}
-					}
-				}
-
-			} else {
-				LOGGER.warn("Not a literal: " + resource);
-			}
-		}
-	}
-
-	/**
 	 * Appends one entry to JSON.
 	 * 
 	 * If a resource is found, the respective URI is used. For literals, a non-empty
 	 * value is used.
 	 */
-	private void appendToJson(Resource resource, Property property, JSONObject jsonObject, String jsonKey) {
+	private void add(Resource resource, Property property, JSONObject jsonObject, String jsonKey) {
 		if (resource.hasProperty(property)) {
 			RDFNode rdfNode = resource.getProperty(property).getObject();
 
@@ -197,4 +163,56 @@ public class JsonExtractor implements ModelProcessor {
 		}
 	}
 
+	/**
+	 * Appends a literal value to JSON.
+	 */
+	private void addLiterals(Resource resource, Property property, JSONObject jsonObject, String jsonKey,
+			String[] languages, boolean multipleValues) {
+		StmtIterator stmtIterator = resource.listProperties(property);
+		while (stmtIterator.hasNext()) {
+			RDFNode rdfNode = stmtIterator.next().getObject();
+
+			if (rdfNode.isLiteral()) {
+				String language = rdfNode.asLiteral().getLanguage();
+				if (languages.length == 0 || Arrays.asList(languages).contains(language)) {
+					String value = rdfNode.asLiteral().getString().trim();
+					if (!value.isEmpty()) {
+						jsonObject.append(jsonKey, value);
+						if (!multipleValues) {
+							return;
+						}
+					}
+				}
+
+			} else {
+				LOGGER.warn("Not a literal: " + resource);
+			}
+		}
+	}
+
+	private void addPublisher(Resource resource, Property property, JSONObject jsonObject, String jsonKey) {
+		if (resource.hasProperty(property)) {
+			RDFNode rdfNode = resource.getProperty(property).getObject();
+
+			if (rdfNode.isURIResource()) {
+				JSONObject publisher = new JSONObject();
+				publisher.put("uri", rdfNode.asResource().getURI());
+				addLiterals(rdfNode.asResource(), FOAF.name, publisher, "name", new String[] {}, false);
+				addLiterals(rdfNode.asResource(), FOAF.mbox, publisher, "mbox", new String[] {}, false);
+				addLiterals(rdfNode.asResource(), FOAF.homepage, publisher, "homepage", new String[] {}, false);
+				jsonObject.append(jsonKey, publisher);
+
+			} else if (rdfNode.isLiteral()) {
+				String value = rdfNode.asLiteral().getString().trim();
+				if (!value.isEmpty()) {
+					JSONObject publisher = new JSONObject();
+					publisher.append("name", value);
+					jsonObject.append(jsonKey, publisher);
+				}
+
+			} else {
+				LOGGER.warn("Not a literal or UriResource: " + resource);
+			}
+		}
+	}
 }

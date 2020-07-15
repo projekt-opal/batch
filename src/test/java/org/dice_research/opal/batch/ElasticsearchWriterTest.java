@@ -12,7 +12,10 @@ import org.dice_research.opal.batch.utils.FileUtils;
 import org.dice_research.opal.batch.utils.TestFiles;
 import org.dice_research.opal.batch.writer.elasticsearch.ElasticsearchWriter;
 import org.dice_research.opal.common.interfaces.ModelProcessor;
+import org.dice_research.opal.test_cases.OpalTestCases;
 import org.junit.After;
+import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,20 +36,75 @@ public class ElasticsearchWriterTest implements ModelProcessor {
 	@After
 	public void tearDown() throws Exception {
 	}
-	
+
 	@Test
-	public void test() throws Exception {
+	public void testKodierungshandbuch() throws Exception {
 
 		// TODO
-//		TestCase testCase = OpalTestCases.getTestCase("edp-2019-12-17", "med-kodierungshandbuch.nt");
-//		Model model = ModelFactory.createDefaultModel().add(testCase.getModel());
-//		String datasetUri = testCase.getDatasetUri();
+		Assume.assumeTrue(false);
 
 		Cfg cfg = new CfgUtils().disableOutputWriting().disableAddingLabelsFile().disableOpal()
 				.disableDatasetUriRewriting().getCfg();
 
 		File input = TestFiles.getFile(TestFiles.EDP_2019_12_17_MED_KODIERUNGSHANDBUCH_TTL);
 		cfg.set(CfgKeys.IO_INPUT, input.getAbsolutePath());
+
+		File outputDir = FileUtils.createtmpDirectory(getClass());
+		cfg.set(CfgKeys.IO_OUTPUT_DIRECTORY, outputDir.getAbsolutePath());
+
+		ConstructorManager constructorManager = new ConstructorManager()
+				.addConstructor(new IndependentConstructor(this));
+
+		new Batch().execute(cfg, constructorManager);
+
+		if (Boolean.TRUE) {
+			FileUtils.deleteDirectory(outputDir);
+		}
+
+	}
+
+	@Test
+	public void testZinkbelastung() throws Exception {
+
+		// TODO
+		Assume.assumeTrue(false);
+
+		Cfg cfg = new CfgUtils().disableOutputWriting().disableAddingLabelsFile().disableOpal()
+				.disableDatasetUriRewriting().getCfg();
+
+		System.out.println(OpalTestCases.listTestSets());
+		Model model = OpalTestCases.getTestCase("edp-2020-06-06", "zinkbelastung").getModel();
+		File input = FileUtils.createTmpModelFile(model, getClass(), true);
+		cfg.set(CfgKeys.IO_INPUT, input.getAbsolutePath());
+
+		File outputDir = FileUtils.createtmpDirectory(getClass());
+		cfg.set(CfgKeys.IO_OUTPUT_DIRECTORY, outputDir.getAbsolutePath());
+
+		ConstructorManager constructorManager = new ConstructorManager()
+				.addConstructor(new IndependentConstructor(this));
+
+		new Batch().execute(cfg, constructorManager);
+
+		if (Boolean.TRUE) {
+			FileUtils.deleteDirectory(outputDir);
+		}
+
+	}
+
+	@Test
+	public void testKriminalstatistik() throws Exception {
+
+		// TODO
+		Assume.assumeTrue(true);
+
+		Cfg cfg = new CfgUtils().disableOutputWriting().disableAddingLabelsFile().disableOpal()
+				.disableDatasetUriRewriting().getCfg();
+
+		System.out.println(OpalTestCases.listTestSets());
+		Model model = OpalTestCases.getTestCase("edp-2020-06-06", "kriminalstatistik").getModel();
+		File input = FileUtils.createTmpModelFile(model, getClass(), true);
+		cfg.set(CfgKeys.IO_INPUT, input.getAbsolutePath());
+
 		File outputDir = FileUtils.createtmpDirectory(getClass());
 		cfg.set(CfgKeys.IO_OUTPUT_DIRECTORY, outputDir.getAbsolutePath());
 

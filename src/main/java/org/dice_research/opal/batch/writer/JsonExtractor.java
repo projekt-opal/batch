@@ -79,7 +79,7 @@ public class JsonExtractor implements ModelProcessor {
 		addLiterals(dataset, DCTerms.description, jsonObject, "description", new String[] { "", "en" }, false);
 		addLiterals(dataset, DCTerms.description, jsonObject, "description_de", new String[] { "de" }, false);
 		add(dataset, DCAT.landingPage, jsonObject, "landingPage");
-		addLiterals(dataset, DCTerms.language, jsonObject, "language", new String[] {}, true);
+		addLiterals(dataset, DCTerms.language, jsonObject, "language", new String[] {}, false);
 		addLiterals(dataset, DCAT.keyword, jsonObject, "keywords", new String[] { "", "en" }, true);
 		addLiterals(dataset, DCAT.keyword, jsonObject, "keywords_de", new String[] { "", "en" }, true);
 		add(dataset, DCTerms.issued, jsonObject, "issued");
@@ -133,7 +133,7 @@ public class JsonExtractor implements ModelProcessor {
 	}
 
 	/**
-	 * Appends one entry to JSON.
+	 * Adds one entry to JSON.
 	 * 
 	 * If a resource is found, the respective URI is used. For literals, a non-empty
 	 * value is used.
@@ -143,12 +143,12 @@ public class JsonExtractor implements ModelProcessor {
 			RDFNode rdfNode = resource.getProperty(property).getObject();
 
 			if (rdfNode.isURIResource()) {
-				jsonObject.append(jsonKey, rdfNode.asResource().getURI());
+				jsonObject.put(jsonKey, rdfNode.asResource().getURI());
 
 			} else if (rdfNode.isLiteral()) {
 				String value = rdfNode.asLiteral().getValue().toString().trim();
 				if (!value.isEmpty()) {
-					jsonObject.append(jsonKey, value);
+					jsonObject.put(jsonKey, value);
 				}
 
 			} else {
@@ -158,7 +158,7 @@ public class JsonExtractor implements ModelProcessor {
 	}
 
 	/**
-	 * Appends a literal value to JSON.
+	 * Adds a literal value to JSON.
 	 */
 	private void addLiterals(Resource resource, Property property, JSONObject jsonObject, String jsonKey,
 			String[] languages, boolean multipleValues) {
@@ -171,8 +171,10 @@ public class JsonExtractor implements ModelProcessor {
 				if (languages.length == 0 || Arrays.asList(languages).contains(language)) {
 					String value = rdfNode.asLiteral().getValue().toString().trim();
 					if (!value.isEmpty()) {
-						jsonObject.append(jsonKey, value);
-						if (!multipleValues) {
+						if (multipleValues) {
+							jsonObject.append(jsonKey, value);
+						} else {
+							jsonObject.put(jsonKey, value);
 							return;
 						}
 					}
@@ -197,14 +199,14 @@ public class JsonExtractor implements ModelProcessor {
 				addLiterals(rdfNode.asResource(), FOAF.name, publisher, "name", new String[] {}, false);
 				addLiterals(rdfNode.asResource(), FOAF.mbox, publisher, "mbox", new String[] {}, false);
 				addLiterals(rdfNode.asResource(), FOAF.homepage, publisher, "homepage", new String[] {}, false);
-				jsonObject.append(jsonKey, publisher);
+				jsonObject.put(jsonKey, publisher);
 
 			} else if (rdfNode.isLiteral()) {
 				String value = rdfNode.asLiteral().getValue().toString().trim();
 				if (!value.isEmpty()) {
 					JSONObject publisher = new JSONObject();
-					publisher.append("name", value);
-					jsonObject.append(jsonKey, publisher);
+					publisher.put("name", value);
+					jsonObject.put(jsonKey, publisher);
 				}
 
 			} else {

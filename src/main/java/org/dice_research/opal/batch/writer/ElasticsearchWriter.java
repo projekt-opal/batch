@@ -1,5 +1,7 @@
 package org.dice_research.opal.batch.writer;
 
+import java.io.IOException;
+
 import org.apache.http.HttpHost;
 import org.apache.jena.rdf.model.Model;
 import org.apache.logging.log4j.LogManager;
@@ -50,6 +52,11 @@ public class ElasticsearchWriter implements Writer {
 
 	@Override
 	public Writer finish() {
+		try {
+			this.restHighLevelClient.close();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 		return this;
 	}
 

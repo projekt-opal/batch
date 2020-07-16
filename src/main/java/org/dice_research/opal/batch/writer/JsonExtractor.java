@@ -71,7 +71,10 @@ public class JsonExtractor implements ModelProcessor {
 	 * Adds the given dataset to JSON.
 	 */
 	private JSONObject processDataset(Resource dataset) {
+		// TODO (browsing)
+		// Expected BEGIN_ARRAY but was STRING at line 1 column 390 path $.originalUrls
 		add(dataset, Opal.PROP_ORIGINAL_URI, jsonObject, "originalUrls");
+
 		addLiterals(dataset, DCAT.theme, jsonObject, "themes", new String[] {}, true);
 		jsonObject.put("uri", dataset.getURI());
 		addLiterals(dataset, DCTerms.title, jsonObject, "title", new String[] { "", "en" }, false);
@@ -87,7 +90,13 @@ public class JsonExtractor implements ModelProcessor {
 		// public List<String> hasQualityMeasurements; // TODO
 		addPublisher(dataset, DCTerms.publisher, jsonObject, "publisher");
 		addPublisher(dataset, DCTerms.creator, jsonObject, "creator");
-		add(dataset, DCTerms.spatial, jsonObject, "spatial");
+
+		// TODO (import)
+		// Exception in thread "main" ElasticsearchStatusException[Elasticsearch
+		// exception [type=mapper_parsing_exception, reason=object mapping for [spatial]
+		// tried to parse field [spatial] as object, but found a concrete value]]
+		// add(dataset, DCTerms.spatial, jsonObject, "spatial");
+
 		addLiterals(dataset, DCAT.contactPoint, jsonObject, "contactPoint", new String[] {}, true); // TODO fields
 		addLiterals(dataset, DCTerms.license, jsonObject, "license", new String[] {}, true); // TODO name
 
@@ -114,7 +123,15 @@ public class JsonExtractor implements ModelProcessor {
 		add(distribution, DCTerms.description, jsonObject, "description");
 		add(distribution, DCTerms.issued, jsonObject, "issued");
 		add(distribution, DCTerms.modified, jsonObject, "modified");
-		addLiterals(distribution, DCTerms.license, jsonObject, "license", new String[] {}, true); // TODO name
+
+		// TODO (import)
+		// Exception in thread "main" ElasticsearchStatusException[Elasticsearch
+		// exception [type=mapper_parsing_exception, reason=object mapping for
+		// [distributions.license] tried to parse field [null] as object, but found a
+		// concrete value]]
+		// addLiterals(distribution, DCTerms.license, jsonObject, "license", new
+		// String[] {}, true); // TODO name
+
 		add(distribution, DCAT.accessURL, jsonObject, "accessUrl");
 		add(distribution, DCAT.downloadURL, jsonObject, "downloadUrl");
 		add(distribution, DCTerms.format, jsonObject, "format"); // TODO use cleaned

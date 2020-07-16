@@ -7,11 +7,11 @@ import org.dice_research.opal.common.interfaces.ModelProcessor;
  *
  * @author Adrian Wilke
  */
-public interface RdfWriter extends ModelProcessor {
+public interface Writer extends ModelProcessor {
 
 	/**
 	 * For finalizing readers, e.g. closing.
 	 */
-	RdfWriter finish();
+	Writer finish();
 
 }

@@ -18,6 +18,12 @@ public abstract class CfgKeys {
 	public static final String IO_OUTPUT_SIZE = "io.outputSize";
 	public static final String IO_OUTPUT_WRITE = "io.outputWrite";
 
+	public static final String IO_ELASTICSEARCH_WRITE = "io.elasticsearch.write";
+	public static final String IO_ELASTICSEARCH_HOSTNAME = "io.elasticsearch.hostname";
+	public static final String IO_ELASTICSEARCH_PORT = "io.elasticsearch.port";
+	public static final String IO_ELASTICSEARCH_SCHEME = "io.elasticsearch.scheme";
+	public static final String IO_ELASTICSEARCH_INDEX = "io.elasticsearch.index";
+
 	public static final String RUN_CATFISH = "run.catfish";
 	public static final String RUN_LANG = "run.languageDetection";
 	public static final String RUN_GEO = "run.geoData";

@@ -1,4 +1,4 @@
-package org.dice_research.opal.batch.writer.elasticsearch;
+package org.dice_research.opal.batch.writer;
 
 import java.util.Arrays;
 import java.util.Spliterator;
@@ -27,19 +27,16 @@ import org.json.JSONObject;
  * 
  * Usage: Create one {@link JsonExtractor} instance for each execution. After
  * calling {@link #processModel(Model, String)}, the result is available via
- * {@link #getJsonObject()}.
+ * {@link #getJson()}.
  * 
  * Based on these Elasticsearch mappings:
  * https://github.com/projekt-opal/opaldata/blob/6a2ecdc4a41c8eb7f168543d732560ece82c1451/elasticsearch-initialization/mappings.json
+ * and this project:
+ * https://github.com/projekt-opal/converter/tree/master/elasticsearch-writer/src/main/java/org/diceresearch/elasticsearchwriter/
  *
  * @author Adrian Wilke
  */
 public class JsonExtractor implements ModelProcessor {
-
-	// TODO
-//	 * https://github.com/projekt-opal/converter/blob/master/elasticsearch-writer/src/main/java/org/diceresearch/elasticsearchwriter/utility/impl/ElasticSearchWriterImpl.java
-//	 * https://github.com/projekt-opal/converter/blob/master/elasticsearch-writer/src/main/java/org/diceresearch/elasticsearchwriter/utility/ModelMapper.java
-//	 * https://github.com/projekt-opal/converter/tree/master/elasticsearch-writer/src/main/java/org/diceresearch/elasticsearchwriter/entity
 
 	private static final Logger LOGGER = LogManager.getLogger();
 
@@ -51,8 +48,15 @@ public class JsonExtractor implements ModelProcessor {
 	/**
 	 * Gets the processing result.
 	 */
-	public JSONObject getJsonObject() {
-		return jsonObject;
+	public String getJson() {
+		return jsonObject.toString();
+	}
+
+	/**
+	 * Gets the processing result.
+	 */
+	public String getJson(int indentFactor) {
+		return jsonObject.toString(indentFactor);
 	}
 
 	/**
@@ -67,9 +71,9 @@ public class JsonExtractor implements ModelProcessor {
 	 * Adds the given dataset to JSON.
 	 */
 	private JSONObject processDataset(Resource dataset) {
-
-		jsonObject.put("uri", dataset.getURI());
 		add(dataset, Opal.PROP_ORIGINAL_URI, jsonObject, "originalUrls");
+		addLiterals(dataset, DCAT.theme, jsonObject, "themes", new String[] {}, true);
+		jsonObject.put("uri", dataset.getURI());
 		addLiterals(dataset, DCTerms.title, jsonObject, "title", new String[] { "", "en" }, false);
 		addLiterals(dataset, DCTerms.title, jsonObject, "title_de", new String[] { "de" }, false);
 		addLiterals(dataset, DCTerms.description, jsonObject, "description", new String[] { "", "en" }, false);
@@ -80,21 +84,21 @@ public class JsonExtractor implements ModelProcessor {
 		addLiterals(dataset, DCAT.keyword, jsonObject, "keywords_de", new String[] { "", "en" }, true);
 		add(dataset, DCTerms.issued, jsonObject, "issued");
 		add(dataset, DCTerms.modified, jsonObject, "modified");
-//		public List<String> licenses; // TODO
-//		public List<String> themes;// TODO
-//		public List<String> hasQualityMeasurements; // TODO
-		addPublisher(dataset, DCTerms.creator, jsonObject, "creator");
+		// public List<String> hasQualityMeasurements; // TODO
 		addPublisher(dataset, DCTerms.publisher, jsonObject, "publisher");
+		addPublisher(dataset, DCTerms.creator, jsonObject, "creator");
 		add(dataset, DCTerms.spatial, jsonObject, "spatial");
-//		appendToJson(dataset, null, jsonObject, "contactPoint");
-		add(dataset, DCTerms.accrualPeriodicity, jsonObject, "accrualPeriodicity");
-		add(dataset, DCTerms.identifier, jsonObject, "dcatIdentifier");
-//		appendToJson(dataset, null, jsonObject, "temporal");
+		addLiterals(dataset, DCAT.contactPoint, jsonObject, "contactPoint", new String[] {}, true); // TODO fields
+		addLiterals(dataset, DCTerms.license, jsonObject, "license", new String[] {}, true); // TODO name
 
 		JSONArray distributions = new JSONArray();
 		getStatementStream(dataset, DCAT.distribution).filter(s -> s.getObject().isURIResource())
 				.map(s -> s.getObject().asResource()).forEach(o -> processDistribution(o, distributions));
 		jsonObject.put("distributions", distributions);
+
+		add(dataset, DCTerms.accrualPeriodicity, jsonObject, "accrualPeriodicity");
+		add(dataset, DCTerms.identifier, jsonObject, "dcatIdentifier");
+		// add(dataset, DCTerms.temporal, jsonObject, "temporal"); // TODO
 
 		return jsonObject;
 	}
@@ -103,30 +107,20 @@ public class JsonExtractor implements ModelProcessor {
 	 * Adds the given distribution to JSON.
 	 */
 	private void processDistribution(Resource distribution, JSONArray distributions) {
-
 		JSONObject jsonObject = new JSONObject();
-		jsonObject.put("dataSetUri", distribution.getURI());
-
-		// TODO not in test data
-		add(distribution, Opal.PROP_ORIGINAL_URI, jsonObject, "originalUrl");
-
+		add(distribution, Opal.PROP_ORIGINAL_URI, jsonObject, "originalURLs"); // TODO test
+		jsonObject.put("uri", distribution.getURI());
 		add(distribution, DCTerms.title, jsonObject, "title");
 		add(distribution, DCTerms.description, jsonObject, "description");
 		add(distribution, DCTerms.issued, jsonObject, "issued");
 		add(distribution, DCTerms.modified, jsonObject, "modified");
-
-		// TODO DCTerms.license
-
+		addLiterals(distribution, DCTerms.license, jsonObject, "license", new String[] {}, true); // TODO name
 		add(distribution, DCAT.accessURL, jsonObject, "accessUrl");
 		add(distribution, DCAT.downloadURL, jsonObject, "downloadUrl");
-
-		// TODO use cleaned
-		add(distribution, DCTerms.format, jsonObject, "format");
-
+		add(distribution, DCTerms.format, jsonObject, "format"); // TODO use cleaned
 		add(distribution, DCAT.byteSize, jsonObject, "byteSize");
-
+		add(distribution, DCTerms.rights, jsonObject, "rights");
 		distributions.put(jsonObject);
-
 	}
 
 	/**
@@ -152,7 +146,7 @@ public class JsonExtractor implements ModelProcessor {
 				jsonObject.append(jsonKey, rdfNode.asResource().getURI());
 
 			} else if (rdfNode.isLiteral()) {
-				String value = rdfNode.asLiteral().getString().trim();
+				String value = rdfNode.asLiteral().getValue().toString().trim();
 				if (!value.isEmpty()) {
 					jsonObject.append(jsonKey, value);
 				}
@@ -175,7 +169,7 @@ public class JsonExtractor implements ModelProcessor {
 			if (rdfNode.isLiteral()) {
 				String language = rdfNode.asLiteral().getLanguage();
 				if (languages.length == 0 || Arrays.asList(languages).contains(language)) {
-					String value = rdfNode.asLiteral().getString().trim();
+					String value = rdfNode.asLiteral().getValue().toString().trim();
 					if (!value.isEmpty()) {
 						jsonObject.append(jsonKey, value);
 						if (!multipleValues) {
@@ -190,6 +184,9 @@ public class JsonExtractor implements ModelProcessor {
 		}
 	}
 
+	/**
+	 * Adds publisher data.
+	 */
 	private void addPublisher(Resource resource, Property property, JSONObject jsonObject, String jsonKey) {
 		if (resource.hasProperty(property)) {
 			RDFNode rdfNode = resource.getProperty(property).getObject();
@@ -203,7 +200,7 @@ public class JsonExtractor implements ModelProcessor {
 				jsonObject.append(jsonKey, publisher);
 
 			} else if (rdfNode.isLiteral()) {
-				String value = rdfNode.asLiteral().getString().trim();
+				String value = rdfNode.asLiteral().getValue().toString().trim();
 				if (!value.isEmpty()) {
 					JSONObject publisher = new JSONObject();
 					publisher.append("name", value);
@@ -215,4 +212,5 @@ public class JsonExtractor implements ModelProcessor {
 			}
 		}
 	}
+
 }

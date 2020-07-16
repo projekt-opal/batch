@@ -25,9 +25,10 @@ import org.dice_research.opal.batch.construction.opal.CatfishConstructor;
 import org.dice_research.opal.batch.reader.RdfFileReader;
 import org.dice_research.opal.batch.reader.RdfReaderResult;
 import org.dice_research.opal.batch.writer.DummyWriter;
+import org.dice_research.opal.batch.writer.ElasticsearchWriter;
 import org.dice_research.opal.batch.writer.OutputInfo;
 import org.dice_research.opal.batch.writer.RdfFileBufferWriter;
-import org.dice_research.opal.batch.writer.RdfWriter;
+import org.dice_research.opal.batch.writer.Writer;
 import org.dice_research.opal.catfish.Catfish;
 import org.dice_research.opal.catfish.checker.DistributionAccessChecker;
 import org.dice_research.opal.common.interfaces.ModelProcessor;
@@ -73,7 +74,8 @@ public class Batch {
 
 	// Internal
 
-	private RdfWriter rdfWriter;
+	private Writer rdfWriter;
+	private Writer elasticsearchWriter;
 	private List<ModelProcessor> modelProcessors;
 	private OutputInfo outputInfo = new OutputInfo();
 
@@ -93,7 +95,7 @@ public class Batch {
 		checkInput(cfg);
 		checkOutput(cfg);
 		modelProcessors = constructorManager.createModelProcessors(cfg).getModelProcessors();
-		setRdfWriter(cfg);
+		setWriters(cfg);
 
 		// Read and process data
 		for (File input : inputs) {
@@ -106,6 +108,7 @@ public class Batch {
 
 		// Finalize
 		rdfWriter.finish();
+		elasticsearchWriter.finish();
 		cfg.set(CfgKeys.INTERNAL_WRITTEN_MODELS, Long.valueOf(outputInfo.writtenModels).toString());
 		cfg.set(CfgKeys.INTERNAL_WRITTEN_TRIPLES, Long.valueOf(outputInfo.writtenTriples).toString());
 		for (Constructor constructor : constructorManager.getConstructors()) {
@@ -141,6 +144,18 @@ public class Batch {
 			String catalogId = CatfishConstructor.getCatalogId(inputs.get(0));
 			cfg.set(CfgKeys.CATFISH_REPLACE_URIS_CATALOG, catalogId);
 			LOGGER.info("Using catalog '" + catalogId + "' for replacing URIs.");
+		}
+
+		if (cfg.has(CfgKeys.IO_ELASTICSEARCH_WRITE) && cfg.getBoolean(CfgKeys.IO_ELASTICSEARCH_WRITE)) {
+			if (!cfg.has(CfgKeys.IO_ELASTICSEARCH_HOSTNAME)) {
+				throw new CfgException("Elasticsearch hostname not set");
+			} else if (!cfg.has(CfgKeys.IO_ELASTICSEARCH_INDEX)) {
+				throw new CfgException("Elasticsearch index not set");
+			} else if (!cfg.has(CfgKeys.IO_ELASTICSEARCH_PORT)) {
+				throw new CfgException("Elasticsearch port not set");
+			} else if (!cfg.has(CfgKeys.IO_ELASTICSEARCH_SCHEME)) {
+				throw new CfgException("Elasticsearch scheme not set");
+			}
 		}
 	}
 
@@ -238,6 +253,7 @@ public class Batch {
 			}
 
 			rdfWriter.processModel(result.getModel(), result.getDatasetUri());
+			elasticsearchWriter.processModel(result.getModel(), result.getDatasetUri());
 			outputInfo.writtenModels++;
 			outputInfo.writtenTriples += result.getModel().size();
 		}
@@ -278,7 +294,7 @@ public class Batch {
 	/**
 	 * Sets the RDF-writer to use.
 	 */
-	private RdfWriter setRdfWriter(Cfg cfg) {
+	private void setWriters(Cfg cfg) {
 		rdfWriter = null;
 		if (cfg.getBoolean(CfgKeys.IO_OUTPUT_WRITE)) {
 
@@ -295,7 +311,17 @@ public class Batch {
 		} else {
 			rdfWriter = new DummyWriter();
 		}
-		return rdfWriter;
+
+		if (cfg.has(CfgKeys.IO_ELASTICSEARCH_WRITE) && cfg.getBoolean(CfgKeys.IO_ELASTICSEARCH_WRITE)) {
+			ElasticsearchWriter writer = new ElasticsearchWriter();
+			writer.hostname = cfg.get(CfgKeys.IO_ELASTICSEARCH_HOSTNAME);
+			writer.port = cfg.getInt(CfgKeys.IO_ELASTICSEARCH_PORT);
+			writer.scheme = cfg.get(CfgKeys.IO_ELASTICSEARCH_SCHEME);
+			writer.index = cfg.get(CfgKeys.IO_ELASTICSEARCH_INDEX);
+			elasticsearchWriter = writer;
+		} else {
+			elasticsearchWriter = new DummyWriter();
+		}
 	}
 
 	/**

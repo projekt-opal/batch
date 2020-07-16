@@ -11,7 +11,7 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class RdfFileWriter implements RdfWriter {
+public class RdfFileWriter implements Writer {
 
 	private static final Logger LOGGER = LogManager.getLogger();
 
@@ -51,7 +51,7 @@ public class RdfFileWriter implements RdfWriter {
 	}
 
 	@Override
-	public RdfWriter finish() {
+	public Writer finish() {
 		if (file != null) {
 			LOGGER.info("Wrote: " + file.getAbsolutePath() + " (" + modelCounter + " datasets)");
 			try {

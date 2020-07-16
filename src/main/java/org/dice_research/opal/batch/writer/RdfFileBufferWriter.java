@@ -17,7 +17,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dice_research.opal.common.vocabulary.Opal;
 
-public class RdfFileBufferWriter implements RdfWriter {
+public class RdfFileBufferWriter implements Writer {
 
 	private static final Logger LOGGER = LogManager.getLogger();
 
@@ -65,7 +65,7 @@ public class RdfFileBufferWriter implements RdfWriter {
 	}
 
 	@Override
-	public RdfWriter finish() {
+	public Writer finish() {
 
 		if (exportModel != null) {
 			try (FileOutputStream fileOutputStream = new FileOutputStream(file)) {

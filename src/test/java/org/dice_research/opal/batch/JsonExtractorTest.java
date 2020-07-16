@@ -10,38 +10,24 @@ import org.dice_research.opal.batch.construction.IndependentConstructor;
 import org.dice_research.opal.batch.utils.CfgUtils;
 import org.dice_research.opal.batch.utils.FileUtils;
 import org.dice_research.opal.batch.utils.TestFiles;
-import org.dice_research.opal.batch.writer.elasticsearch.ElasticsearchWriter;
+import org.dice_research.opal.batch.writer.JsonExtractor;
 import org.dice_research.opal.common.interfaces.ModelProcessor;
 import org.dice_research.opal.test_cases.OpalTestCases;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Tests {@link ElasticsearchWriter}.
+ * Tests {@link JsonExtractor}.
  *
  * @author Adrian Wilke
  */
-public class ElasticsearchWriterTest implements ModelProcessor {
+public class JsonExtractorTest implements ModelProcessor {
 
-	private ElasticsearchWriter writer;
-
-	@Before
-	public void setUp() throws Exception {
-		writer = new ElasticsearchWriter();
-	}
-
-	@After
-	public void tearDown() throws Exception {
-	}
+	private JsonExtractor jsonExtractor;
 
 	@Test
 	public void testKodierungshandbuch() throws Exception {
-
-		// TODO
-		Assume.assumeTrue(false);
+		jsonExtractor = new JsonExtractor();
 
 		Cfg cfg = new CfgUtils().disableOutputWriting().disableAddingLabelsFile().disableOpal()
 				.disableDatasetUriRewriting().getCfg();
@@ -57,22 +43,22 @@ public class ElasticsearchWriterTest implements ModelProcessor {
 
 		new Batch().execute(cfg, constructorManager);
 
-		if (Boolean.TRUE) {
-			FileUtils.deleteDirectory(outputDir);
+		Assert.assertTrue(jsonExtractor.getJson().length() > 3000);
+
+		if (Boolean.FALSE) {
+			System.out.println(jsonExtractor.getJson(2));
 		}
 
+		FileUtils.deleteDirectory(outputDir);
 	}
 
 	@Test
 	public void testZinkbelastung() throws Exception {
-
-		// TODO
-		Assume.assumeTrue(false);
+		jsonExtractor = new JsonExtractor();
 
 		Cfg cfg = new CfgUtils().disableOutputWriting().disableAddingLabelsFile().disableOpal()
 				.disableDatasetUriRewriting().getCfg();
 
-		System.out.println(OpalTestCases.listTestSets());
 		Model model = OpalTestCases.getTestCase("edp-2020-06-06", "zinkbelastung").getModel();
 		File input = FileUtils.createTmpModelFile(model, getClass(), true);
 		cfg.set(CfgKeys.IO_INPUT, input.getAbsolutePath());
@@ -85,22 +71,23 @@ public class ElasticsearchWriterTest implements ModelProcessor {
 
 		new Batch().execute(cfg, constructorManager);
 
-		if (Boolean.TRUE) {
-			FileUtils.deleteDirectory(outputDir);
+		Assert.assertTrue(jsonExtractor.getJson().length() > 3000);
+
+		if (Boolean.FALSE) {
+			model.write(System.out, "TTL");
+			System.out.println(jsonExtractor.getJson(2));
 		}
 
+		FileUtils.deleteDirectory(outputDir);
 	}
 
 	@Test
 	public void testKriminalstatistik() throws Exception {
-
-		// TODO
-		Assume.assumeTrue(true);
+		jsonExtractor = new JsonExtractor();
 
 		Cfg cfg = new CfgUtils().disableOutputWriting().disableAddingLabelsFile().disableOpal()
 				.disableDatasetUriRewriting().getCfg();
 
-		System.out.println(OpalTestCases.listTestSets());
 		Model model = OpalTestCases.getTestCase("edp-2020-06-06", "kriminalstatistik").getModel();
 		File input = FileUtils.createTmpModelFile(model, getClass(), true);
 		cfg.set(CfgKeys.IO_INPUT, input.getAbsolutePath());
@@ -113,15 +100,19 @@ public class ElasticsearchWriterTest implements ModelProcessor {
 
 		new Batch().execute(cfg, constructorManager);
 
-		if (Boolean.TRUE) {
-			FileUtils.deleteDirectory(outputDir);
+		Assert.assertTrue(jsonExtractor.getJson().length() > 3000);
+
+		if (Boolean.FALSE) {
+			model.write(System.out, "TTL");
+			System.out.println(jsonExtractor.getJson(2));
 		}
 
+		FileUtils.deleteDirectory(outputDir);
 	}
 
 	@Override
 	public void processModel(Model model, String datasetUri) throws Exception {
-		writer.processModel(model, datasetUri);
+		jsonExtractor.processModel(model, datasetUri);
 	}
 
 }

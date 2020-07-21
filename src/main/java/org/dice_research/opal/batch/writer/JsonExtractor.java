@@ -21,6 +21,10 @@ import org.dice_research.opal.common.interfaces.ModelProcessor;
 import org.dice_research.opal.common.vocabulary.Opal;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.locationtech.jts.geom.Point;
+
+import io.github.galbiston.geosparql_jena.implementation.GeometryWrapper;
+import io.github.galbiston.geosparql_jena.implementation.datatype.WKTDatatype;
 
 /**
  * Extracts data from model and creates a JSON object.
@@ -71,23 +75,33 @@ public class JsonExtractor implements ModelProcessor {
 	 * Adds the given dataset to JSON.
 	 */
 	private JSONObject processDataset(Resource dataset) {
-		// TODO (browsing)
-		// Expected BEGIN_ARRAY but was STRING at line 1 column 390 path $.originalUrls
-		add(dataset, Opal.PROP_ORIGINAL_URI, jsonObject, "originalUrls");
 
-		addLiterals(dataset, DCAT.theme, jsonObject, "themes", new String[] {}, true);
+		// Based on:
+		// https://github.com/projekt-opal/converter/blob/master/elasticsearch-writer/src/main/java/org/diceresearch/elasticsearchwriter/entity/DataSet.java
+
+		// --- ES Strings
+
 		jsonObject.put("uri", dataset.getURI());
 		addLiterals(dataset, DCTerms.title, jsonObject, "title", new String[] { "", "en" }, false);
 		addLiterals(dataset, DCTerms.title, jsonObject, "title_de", new String[] { "de" }, false);
 		addLiterals(dataset, DCTerms.description, jsonObject, "description", new String[] { "", "en" }, false);
 		addLiterals(dataset, DCTerms.description, jsonObject, "description_de", new String[] { "de" }, false);
-		add(dataset, DCAT.landingPage, jsonObject, "landingPage");
+		add(dataset, DCAT.landingPage, jsonObject, "landingPage", false);
 		addLiterals(dataset, DCTerms.language, jsonObject, "language", new String[] {}, false);
+//		add(dataset, DCTerms.issued, jsonObject, "issued", false); // TODO Govdata exception
+//		add(dataset, DCTerms.modified, jsonObject, "modified", false); // TODO Govdata exception
+		add(dataset, DCTerms.accrualPeriodicity, jsonObject, "accrualPeriodicity", false);
+		add(dataset, DCTerms.identifier, jsonObject, "dcatIdentifier", false);
+
+		// --- ES String lists
+
+		add(dataset, Opal.PROP_ORIGINAL_URI, jsonObject, "originalUrls", true);
 		addLiterals(dataset, DCAT.keyword, jsonObject, "keywords", new String[] { "", "en" }, true);
 		addLiterals(dataset, DCAT.keyword, jsonObject, "keywords_de", new String[] { "", "en" }, true);
-		add(dataset, DCTerms.issued, jsonObject, "issued");
-		add(dataset, DCTerms.modified, jsonObject, "modified");
-		// public List<String> hasQualityMeasurements; // TODO
+		addLiterals(dataset, DCAT.theme, jsonObject, "themes", new String[] {}, true);
+
+		// --- ES objects
+
 		addPublisher(dataset, DCTerms.publisher, jsonObject, "publisher");
 		addPublisher(dataset, DCTerms.creator, jsonObject, "creator");
 
@@ -96,18 +110,22 @@ public class JsonExtractor implements ModelProcessor {
 		// exception [type=mapper_parsing_exception, reason=object mapping for [spatial]
 		// tried to parse field [spatial] as object, but found a concrete value]]
 		// add(dataset, DCTerms.spatial, jsonObject, "spatial");
+		addGeo(dataset, DCTerms.spatial, jsonObject, "spatial");
 
 		addLiterals(dataset, DCAT.contactPoint, jsonObject, "contactPoint", new String[] {}, true); // TODO fields
+
+		// add(dataset, DCTerms.temporal, jsonObject, "temporal"); // TODO
+
+		// --- ES object lists
+
 		addLiterals(dataset, DCTerms.license, jsonObject, "license", new String[] {}, true); // TODO name
+
+		// public List<String> hasQualityMeasurements; // TODO
 
 		JSONArray distributions = new JSONArray();
 		getStatementStream(dataset, DCAT.distribution).filter(s -> s.getObject().isURIResource())
 				.map(s -> s.getObject().asResource()).forEach(o -> processDistribution(o, distributions));
 		jsonObject.put("distributions", distributions);
-
-		add(dataset, DCTerms.accrualPeriodicity, jsonObject, "accrualPeriodicity");
-		add(dataset, DCTerms.identifier, jsonObject, "dcatIdentifier");
-		// add(dataset, DCTerms.temporal, jsonObject, "temporal"); // TODO
 
 		return jsonObject;
 	}
@@ -116,13 +134,19 @@ public class JsonExtractor implements ModelProcessor {
 	 * Adds the given distribution to JSON.
 	 */
 	private void processDistribution(Resource distribution, JSONArray distributions) {
+
+		// Based on:
+		// https://github.com/projekt-opal/converter/blob/master/elasticsearch-writer/src/main/java/org/diceresearch/elasticsearchwriter/entity/Distribution.java
+
 		JSONObject jsonObject = new JSONObject();
-		add(distribution, Opal.PROP_ORIGINAL_URI, jsonObject, "originalURLs"); // TODO test
+
+		// --- ES Strings
+
 		jsonObject.put("uri", distribution.getURI());
-		add(distribution, DCTerms.title, jsonObject, "title");
-		add(distribution, DCTerms.description, jsonObject, "description");
-		add(distribution, DCTerms.issued, jsonObject, "issued");
-		add(distribution, DCTerms.modified, jsonObject, "modified");
+		add(distribution, DCTerms.title, jsonObject, "title", false);
+		add(distribution, DCTerms.description, jsonObject, "description", false);
+		add(distribution, DCTerms.issued, jsonObject, "issued", false);
+		add(distribution, DCTerms.modified, jsonObject, "modified", false);
 
 		// TODO (import)
 		// Exception in thread "main" ElasticsearchStatusException[Elasticsearch
@@ -132,11 +156,19 @@ public class JsonExtractor implements ModelProcessor {
 		// addLiterals(distribution, DCTerms.license, jsonObject, "license", new
 		// String[] {}, true); // TODO name
 
-		add(distribution, DCAT.accessURL, jsonObject, "accessUrl");
-		add(distribution, DCAT.downloadURL, jsonObject, "downloadUrl");
-		add(distribution, DCTerms.format, jsonObject, "format"); // TODO use cleaned
-		add(distribution, DCAT.byteSize, jsonObject, "byteSize");
-		add(distribution, DCTerms.rights, jsonObject, "rights");
+		add(distribution, DCAT.accessURL, jsonObject, "accessUrl", false);
+		add(distribution, DCAT.downloadURL, jsonObject, "downloadUrl", false);
+		add(distribution, DCTerms.format, jsonObject, "format", false); // TODO use cleaned
+
+		// --- ES String lists
+
+		add(distribution, Opal.PROP_ORIGINAL_URI, jsonObject, "originalURLs", false); // TODO test
+		add(distribution, DCTerms.rights, jsonObject, "rights", true);
+
+		// --- ES long
+
+		add(distribution, DCAT.byteSize, jsonObject, "byteSize", false);
+
 		distributions.put(jsonObject);
 	}
 
@@ -150,26 +182,35 @@ public class JsonExtractor implements ModelProcessor {
 	}
 
 	/**
-	 * Adds one entry to JSON.
+	 * Adds entries to JSON.
 	 * 
 	 * If a resource is found, the respective URI is used. For literals, a non-empty
 	 * value is used.
 	 */
-	private void add(Resource resource, Property property, JSONObject jsonObject, String jsonKey) {
-		if (resource.hasProperty(property)) {
-			RDFNode rdfNode = resource.getProperty(property).getObject();
+	private void add(Resource resource, Property property, JSONObject jsonObject, String jsonKey,
+			boolean multipleValues) {
+		StmtIterator stmtIterator = resource.listProperties(property);
+		while (stmtIterator.hasNext()) {
+			RDFNode rdfNode = stmtIterator.next().getObject();
+			String value = null;
 
 			if (rdfNode.isURIResource()) {
-				jsonObject.put(jsonKey, rdfNode.asResource().getURI());
+				value = rdfNode.asResource().getURI().trim();
 
 			} else if (rdfNode.isLiteral()) {
-				String value = rdfNode.asLiteral().getValue().toString().trim();
-				if (!value.isEmpty()) {
-					jsonObject.put(jsonKey, value);
-				}
+				value = rdfNode.asLiteral().getValue().toString().trim();
 
 			} else {
 				LOGGER.warn("Not a literal or UriResource: " + resource);
+			}
+
+			if (value != null && !value.isEmpty()) {
+				if (multipleValues) {
+					jsonObject.append(jsonKey, value);
+				} else {
+					jsonObject.put(jsonKey, value);
+					return;
+				}
 			}
 		}
 	}
@@ -198,7 +239,8 @@ public class JsonExtractor implements ModelProcessor {
 				}
 
 			} else {
-				LOGGER.warn("Not a literal: " + resource);
+				// TOOD
+//				LOGGER.warn("Not a literal: " + resource);
 			}
 		}
 	}
@@ -228,6 +270,69 @@ public class JsonExtractor implements ModelProcessor {
 
 			} else {
 				LOGGER.warn("Not a literal or UriResource: " + resource);
+			}
+		}
+	}
+
+	/**
+	 * TODO: Dev method
+	 */
+	private void recursivelyAddTriples(Resource resource, StringBuilder sb) {
+		StmtIterator stmtIterator = resource.listProperties();
+		while (stmtIterator.hasNext()) {
+			Statement stmt = stmtIterator.next();
+			sb.append(" ");
+			sb.append(stmt.toString());
+			sb.append(System.lineSeparator());
+			if (stmt.getObject().isResource()) {
+				recursivelyAddTriples(stmt.getObject().asResource(), sb);
+			}
+		}
+	}
+
+	/**
+	 * Adds geo data.
+	 * 
+	 * TODO
+	 */
+	private void addGeo(Resource resource, Property property, JSONObject jsonObject, String jsonKey) {
+		if (resource.hasProperty(property)) {
+			RDFNode rdfNode = resource.getProperty(property).getObject();
+
+			if (rdfNode.isURIResource()) {
+
+			} else if (rdfNode.isLiteral()) {
+
+			} else {
+
+				// https://www.elastic.co/guide/en/elasticsearch/reference/7.3/geo-point.html
+
+				// Check "Geohash"
+
+				// Blank nodes in Govdata sometimes contain geo data
+
+				Resource blankNode = rdfNode.asResource();
+				if (blankNode.hasProperty(DCAT.centroid)) {
+					RDFNode centroid = blankNode.getProperty(DCAT.centroid).getObject();
+					if (centroid.isLiteral()) {
+
+						if (WKTDatatype.checkURI(centroid.asLiteral().getDatatypeURI())) {
+							String lex = centroid.asLiteral().getLexicalForm().trim();
+							GeometryWrapper geometryWrapper = WKTDatatype.INSTANCE.parse(lex);
+							Point point = geometryWrapper.getParsingGeometry().getCentroid();
+
+							JSONObject geometry = new JSONObject();
+							geometry.put("geometry", point.getX() + "," + point.getY());
+							jsonObject.put(jsonKey, geometry);
+						}
+					}
+				}
+
+				// StringBuilder sb = new StringBuilder();
+				// recursivelyAddTriples(rdfNode.asResource(), sb);
+				// System.err.println("B: " + rdfNode.asResource().getURI() +
+				// System.lineSeparator() + sb.toString());
+
 			}
 		}
 	}

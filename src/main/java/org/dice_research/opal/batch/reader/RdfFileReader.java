@@ -92,9 +92,13 @@ public class RdfFileReader implements RdfReader {
 		}
 	}
 
-	private void addStatements(Model model, Resource resource, Set<String> processedResourceUris) {
+	private void addStatements(Model model, Resource resource, Set<String> processed) {
 
-		processedResourceUris.add(resource.getURI());
+		if (resource.isURIResource()) {
+			processed.add(resource.getURI());
+		} else if (resource.isAnon()) {
+			processed.add(resource.toString());
+		}
 
 		StmtIterator stmtIterator = resource.listProperties();
 		while (stmtIterator.hasNext()) {
@@ -102,9 +106,11 @@ public class RdfFileReader implements RdfReader {
 			Statement statement = stmtIterator.next();
 			model.add(statement);
 
-			if (statement.getObject().isResource()
-					&& !processedResourceUris.contains(statement.getObject().asResource().getURI())) {
-				addStatements(model, statement.getObject().asResource(), processedResourceUris);
+			if (statement.getObject().isURIResource()
+					&& !processed.contains(statement.getObject().asResource().getURI())) {
+				addStatements(model, statement.getObject().asResource(), processed);
+			} else if (statement.getObject().isAnon() && !processed.contains(statement.getObject().toString())) {
+				addStatements(model, statement.getObject().asResource(), processed);
 			}
 		}
 	}

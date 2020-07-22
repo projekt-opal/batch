@@ -274,7 +274,6 @@ public class Batch {
 					currentDatasetUri = ((Catfish) modelProcessor).getNewDatasetUri();
 				}
 			}
-
 		}
 
 		return currentDatasetUri;

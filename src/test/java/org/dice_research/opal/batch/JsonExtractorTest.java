@@ -10,27 +10,27 @@ import org.dice_research.opal.batch.construction.IndependentConstructor;
 import org.dice_research.opal.batch.utils.CfgUtils;
 import org.dice_research.opal.batch.utils.FileUtils;
 import org.dice_research.opal.batch.utils.TestFiles;
-import org.dice_research.opal.batch.writer.JsonExtractor;
+import org.dice_research.opal.batch.writer.ElasticsearchJson;
 import org.dice_research.opal.common.interfaces.ModelProcessor;
 import org.dice_research.opal.test_cases.OpalTestCases;
 import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Tests {@link JsonExtractor}.
+ * Tests {@link ElasticsearchJson}.
  *
  * @author Adrian Wilke
  */
 public class JsonExtractorTest implements ModelProcessor {
 
-	private JsonExtractor jsonExtractor;
+	private ElasticsearchJson jsonExtractor;
 
 	@Test
 	public void testKodierungshandbuch() throws Exception {
-		jsonExtractor = new JsonExtractor();
+		jsonExtractor = new ElasticsearchJson();
 
-		Cfg cfg = new CfgUtils().disableOutputWriting().disableAddingLabelsFile().disableOpal()
-				.disableDatasetUriRewriting().getCfg();
+		Cfg cfg = new CfgUtils().disableWriting().disableAddingLabelsFile().disableOpalComponents()
+				.disableUriRewriting().getCfg();
 
 		File input = TestFiles.getFile(TestFiles.EDP_2019_12_17_MED_KODIERUNGSHANDBUCH_TTL);
 		cfg.set(CfgKeys.IO_INPUT, input.getAbsolutePath());
@@ -54,10 +54,10 @@ public class JsonExtractorTest implements ModelProcessor {
 
 	@Test
 	public void testZinkbelastung() throws Exception {
-		jsonExtractor = new JsonExtractor();
+		jsonExtractor = new ElasticsearchJson();
 
-		Cfg cfg = new CfgUtils().disableOutputWriting().disableAddingLabelsFile().disableOpal()
-				.disableDatasetUriRewriting().getCfg();
+		Cfg cfg = new CfgUtils().disableWriting().disableAddingLabelsFile().disableOpalComponents()
+				.disableUriRewriting().getCfg();
 
 		Model model = OpalTestCases.getTestCase("edp-2020-06-06", "zinkbelastung").getModel();
 		File input = FileUtils.createTmpModelFile(model, getClass(), true);
@@ -83,10 +83,10 @@ public class JsonExtractorTest implements ModelProcessor {
 
 	@Test
 	public void testKriminalstatistik() throws Exception {
-		jsonExtractor = new JsonExtractor();
+		jsonExtractor = new ElasticsearchJson();
 
-		Cfg cfg = new CfgUtils().disableOutputWriting().disableAddingLabelsFile().disableOpal()
-				.disableDatasetUriRewriting().getCfg();
+		Cfg cfg = new CfgUtils().disableWriting().disableAddingLabelsFile().disableOpalComponents()
+				.disableUriRewriting().getCfg();
 
 		Model model = OpalTestCases.getTestCase("edp-2020-06-06", "kriminalstatistik").getModel();
 		File input = FileUtils.createTmpModelFile(model, getClass(), true);

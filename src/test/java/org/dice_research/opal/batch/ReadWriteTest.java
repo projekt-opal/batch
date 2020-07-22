@@ -23,7 +23,7 @@ public class ReadWriteTest {
 		File inputFile = TestFiles.getFile(TestFiles.EDP_2019_12_17_MED_KODIERUNGSHANDBUCH_NQ);
 		File outputDir = FileUtils.createtmpDirectory(getClass());
 
-		Cfg cfg = new CfgUtils().disableDatasetUriRewriting().getCfg();
+		Cfg cfg = new CfgUtils().disableUriRewriting().getCfg();
 		cfg.set(CfgKeys.IO_INPUT, inputFile.getAbsolutePath());
 		cfg.set(CfgKeys.IO_INPUT_GRAPH, TestFiles.DEFAULT_GRAPH_NAME);
 		cfg.set(CfgKeys.IO_OUTPUT_DIRECTORY, outputDir.getAbsolutePath());
@@ -41,7 +41,7 @@ public class ReadWriteTest {
 		File inputFile = TestFiles.getFile(TestFiles.EDP_2019_12_17_MED_KODIERUNGSHANDBUCH_TTL);
 		File outputDir = FileUtils.createtmpDirectory(getClass());
 
-		Cfg cfg = new CfgUtils().disableDatasetUriRewriting().getCfg();
+		Cfg cfg = new CfgUtils().disableUriRewriting().getCfg();
 		cfg.set(CfgKeys.IO_INPUT, inputFile.getAbsolutePath());
 		cfg.set(CfgKeys.IO_INPUT_GRAPH, TestFiles.DEFAULT_GRAPH_NAME);
 		cfg.set(CfgKeys.IO_OUTPUT_DIRECTORY, outputDir.getAbsolutePath());
@@ -59,7 +59,7 @@ public class ReadWriteTest {
 		File inputDir = TestFiles.getFile(TestFiles.EDP_2019_12_17_MED_KODIERUNGSHANDBUCH_NQ).getParentFile();
 		File outputDir = FileUtils.createtmpDirectory(getClass());
 
-		Cfg cfg = new CfgUtils().disableDatasetUriRewriting().getCfg();
+		Cfg cfg = new CfgUtils().disableUriRewriting().getCfg();
 		cfg.set(CfgKeys.IO_INPUT, inputDir.getAbsolutePath());
 		cfg.set(CfgKeys.IO_INPUT_GRAPH, TestFiles.DEFAULT_GRAPH_NAME);
 		cfg.set(CfgKeys.IO_OUTPUT_DIRECTORY, outputDir.getAbsolutePath());
@@ -77,7 +77,7 @@ public class ReadWriteTest {
 		File inputDir = TestFiles.getFile(TestFiles.EDP_2019_12_17_MED_KODIERUNGSHANDBUCH_TTL).getParentFile();
 		File outputDir = FileUtils.createtmpDirectory(getClass());
 
-		Cfg cfg = new CfgUtils().disableDatasetUriRewriting().getCfg();
+		Cfg cfg = new CfgUtils().disableUriRewriting().getCfg();
 		cfg.set(CfgKeys.IO_INPUT, inputDir.getAbsolutePath());
 		cfg.set(CfgKeys.IO_INPUT_GRAPH, TestFiles.DEFAULT_GRAPH_NAME);
 		cfg.set(CfgKeys.IO_OUTPUT_DIRECTORY, outputDir.getAbsolutePath());

@@ -41,10 +41,10 @@ public class ElasticsearchWriter implements Writer {
 					RestClient.builder(new HttpHost(hostname, port, scheme)));
 		}
 
-		JsonExtractor jsonExtractor = new JsonExtractor();
-		jsonExtractor.processModel(model, datasetUri);
+		ElasticsearchJson json = new ElasticsearchJson();
+		json.processModel(model, datasetUri);
 
-		IndexRequest indexRequest = new IndexRequest(index).source(jsonExtractor.getJson(), XContentType.JSON);
+		IndexRequest indexRequest = new IndexRequest(index).source(json.getJson(), XContentType.JSON);
 		IndexResponse indexResponse = restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
 
 		LOGGER.debug(indexResponse);

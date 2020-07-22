@@ -1,8 +1,13 @@
 package org.dice_research.opal.batch.writer;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -15,9 +20,11 @@ import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.sparql.vocabulary.FOAF;
 import org.apache.jena.vocabulary.DCAT;
 import org.apache.jena.vocabulary.DCTerms;
+import org.apache.jena.vocabulary.VCARD4;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dice_research.opal.common.interfaces.ModelProcessor;
+import org.dice_research.opal.common.vocabulary.Dqv;
 import org.dice_research.opal.common.vocabulary.Opal;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -29,23 +36,25 @@ import io.github.galbiston.geosparql_jena.implementation.datatype.WKTDatatype;
 /**
  * Extracts data from model and creates a JSON object.
  * 
- * Usage: Create one {@link JsonExtractor} instance for each execution. After
- * calling {@link #processModel(Model, String)}, the result is available via
- * {@link #getJson()}.
+ * Usage: Create one {@link ElasticsearchJson} instance for each execution.
+ * After calling {@link #processModel(Model, String)}, the result is available
+ * via {@link #getJson()}.
  * 
  * Based on these Elasticsearch mappings:
  * https://github.com/projekt-opal/opaldata/blob/6a2ecdc4a41c8eb7f168543d732560ece82c1451/elasticsearch-initialization/mappings.json
- * and this project:
+ * and this code:
  * https://github.com/projekt-opal/converter/tree/master/elasticsearch-writer/src/main/java/org/diceresearch/elasticsearchwriter/
  *
  * @author Adrian Wilke
  */
-public class JsonExtractor implements ModelProcessor {
+public class ElasticsearchJson implements ModelProcessor {
 
 	private static final Logger LOGGER = LogManager.getLogger();
 
 	private static final boolean PARALLEL_STREAMS = true;
 	private static final int SPLITERATOR_CHARACTERISTICS = Spliterator.IMMUTABLE | Spliterator.NONNULL;
+
+	private static final Pattern DATE_PATTERN = Pattern.compile("(^\\d{4}-\\d{2}-\\d{2})(.*)");
 
 	private JSONObject jsonObject = new JSONObject();
 
@@ -86,41 +95,33 @@ public class JsonExtractor implements ModelProcessor {
 		addLiterals(dataset, DCTerms.title, jsonObject, "title_de", new String[] { "de" }, false);
 		addLiterals(dataset, DCTerms.description, jsonObject, "description", new String[] { "", "en" }, false);
 		addLiterals(dataset, DCTerms.description, jsonObject, "description_de", new String[] { "de" }, false);
+		addLiterals(dataset, DCTerms.language, jsonObject, "language", null, false);
+		addDate(dataset, DCTerms.issued, jsonObject, "issued");
+		addDate(dataset, DCTerms.modified, jsonObject, "modified");
 		add(dataset, DCAT.landingPage, jsonObject, "landingPage", false);
-		addLiterals(dataset, DCTerms.language, jsonObject, "language", new String[] {}, false);
-//		add(dataset, DCTerms.issued, jsonObject, "issued", false); // TODO Govdata exception
-//		add(dataset, DCTerms.modified, jsonObject, "modified", false); // TODO Govdata exception
 		add(dataset, DCTerms.accrualPeriodicity, jsonObject, "accrualPeriodicity", false);
 		add(dataset, DCTerms.identifier, jsonObject, "dcatIdentifier", false);
 
 		// --- ES String lists
 
-		add(dataset, Opal.PROP_ORIGINAL_URI, jsonObject, "originalUrls", true);
 		addLiterals(dataset, DCAT.keyword, jsonObject, "keywords", new String[] { "", "en" }, true);
 		addLiterals(dataset, DCAT.keyword, jsonObject, "keywords_de", new String[] { "", "en" }, true);
-		addLiterals(dataset, DCAT.theme, jsonObject, "themes", new String[] {}, true);
+		addLiterals(dataset, DCAT.theme, jsonObject, "themes", null, true);
+		add(dataset, Opal.PROP_ORIGINAL_URI, jsonObject, "originalUrls", true);
 
 		// --- ES objects
 
 		addPublisher(dataset, DCTerms.publisher, jsonObject, "publisher");
 		addPublisher(dataset, DCTerms.creator, jsonObject, "creator");
-
-		// TODO (import)
-		// Exception in thread "main" ElasticsearchStatusException[Elasticsearch
-		// exception [type=mapper_parsing_exception, reason=object mapping for [spatial]
-		// tried to parse field [spatial] as object, but found a concrete value]]
-		// add(dataset, DCTerms.spatial, jsonObject, "spatial");
 		addGeo(dataset, DCTerms.spatial, jsonObject, "spatial");
+		addContactPoint(dataset, DCAT.contactPoint, jsonObject, "contactPoint");
 
-		addLiterals(dataset, DCAT.contactPoint, jsonObject, "contactPoint", new String[] {}, true); // TODO fields
-
-		// add(dataset, DCTerms.temporal, jsonObject, "temporal"); // TODO
+		// TODO DCTerms.temporal (startDate, endDate) currently not used
 
 		// --- ES object lists
 
-		addLiterals(dataset, DCTerms.license, jsonObject, "license", new String[] {}, true); // TODO name
-
-		// public List<String> hasQualityMeasurements; // TODO
+		addLicense(dataset, DCTerms.license, jsonObject, "license");
+		addMetrics(dataset, Dqv.HAS_QUALITY_MEASUREMENT, jsonObject, "hasQualityMeasurements");
 
 		JSONArray distributions = new JSONArray();
 		getStatementStream(dataset, DCAT.distribution).filter(s -> s.getObject().isURIResource())
@@ -145,40 +146,23 @@ public class JsonExtractor implements ModelProcessor {
 		jsonObject.put("uri", distribution.getURI());
 		add(distribution, DCTerms.title, jsonObject, "title", false);
 		add(distribution, DCTerms.description, jsonObject, "description", false);
-		add(distribution, DCTerms.issued, jsonObject, "issued", false);
-		add(distribution, DCTerms.modified, jsonObject, "modified", false);
-
-		// TODO (import)
-		// Exception in thread "main" ElasticsearchStatusException[Elasticsearch
-		// exception [type=mapper_parsing_exception, reason=object mapping for
-		// [distributions.license] tried to parse field [null] as object, but found a
-		// concrete value]]
-		// addLiterals(distribution, DCTerms.license, jsonObject, "license", new
-		// String[] {}, true); // TODO name
-
+		addDate(distribution, DCTerms.issued, jsonObject, "issued");
+		addDate(distribution, DCTerms.modified, jsonObject, "modified");
 		add(distribution, DCAT.accessURL, jsonObject, "accessUrl", false);
 		add(distribution, DCAT.downloadURL, jsonObject, "downloadUrl", false);
-		add(distribution, DCTerms.format, jsonObject, "format", false); // TODO use cleaned
+		addFormat(distribution, DCTerms.format, jsonObject, "format");
+		addLicense(distribution, DCTerms.license, jsonObject, "license");
 
 		// --- ES String lists
 
-		add(distribution, Opal.PROP_ORIGINAL_URI, jsonObject, "originalURLs", false); // TODO test
+		add(distribution, Opal.PROP_ORIGINAL_URI, jsonObject, "originalURLs", false);
 		add(distribution, DCTerms.rights, jsonObject, "rights", true);
 
 		// --- ES long
 
-		add(distribution, DCAT.byteSize, jsonObject, "byteSize", false);
+		addBytes(distribution, DCAT.byteSize, jsonObject, "byteSize");
 
 		distributions.put(jsonObject);
-	}
-
-	/**
-	 * Gets a stream of triples for the resource-property-combination.
-	 */
-	private Stream<Statement> getStatementStream(Resource resource, Property property) {
-		return StreamSupport.stream(
-				Spliterators.spliteratorUnknownSize(resource.listProperties(property), SPLITERATOR_CHARACTERISTICS),
-				PARALLEL_STREAMS);
 	}
 
 	/**
@@ -197,11 +181,13 @@ public class JsonExtractor implements ModelProcessor {
 			if (rdfNode.isURIResource()) {
 				value = rdfNode.asResource().getURI().trim();
 
+			} else if (rdfNode.isAnon()) {
+
 			} else if (rdfNode.isLiteral()) {
 				value = rdfNode.asLiteral().getValue().toString().trim();
 
-			} else {
-				LOGGER.warn("Not a literal or UriResource: " + resource);
+			} else if (rdfNode.isStmtResource()) {
+				LOGGER.warn("RDF* triple term");
 			}
 
 			if (value != null && !value.isEmpty()) {
@@ -216,17 +202,16 @@ public class JsonExtractor implements ModelProcessor {
 	}
 
 	/**
-	 * Adds a literal value to JSON.
+	 * Adds literal values to JSON.
 	 */
 	private void addLiterals(Resource resource, Property property, JSONObject jsonObject, String jsonKey,
 			String[] languages, boolean multipleValues) {
 		StmtIterator stmtIterator = resource.listProperties(property);
 		while (stmtIterator.hasNext()) {
 			RDFNode rdfNode = stmtIterator.next().getObject();
-
 			if (rdfNode.isLiteral()) {
 				String language = rdfNode.asLiteral().getLanguage();
-				if (languages.length == 0 || Arrays.asList(languages).contains(language)) {
+				if (languages == null || languages.length == 0 || Arrays.asList(languages).contains(language)) {
 					String value = rdfNode.asLiteral().getValue().toString().trim();
 					if (!value.isEmpty()) {
 						if (multipleValues) {
@@ -237,10 +222,6 @@ public class JsonExtractor implements ModelProcessor {
 						}
 					}
 				}
-
-			} else {
-				// TOOD
-//				LOGGER.warn("Not a literal: " + resource);
 			}
 		}
 	}
@@ -267,33 +248,123 @@ public class JsonExtractor implements ModelProcessor {
 					publisher.put("name", value);
 					jsonObject.put(jsonKey, publisher);
 				}
-
-			} else {
-				LOGGER.warn("Not a literal or UriResource: " + resource);
 			}
 		}
 	}
 
-	/**
-	 * TODO: Dev method
-	 */
-	private void recursivelyAddTriples(Resource resource, StringBuilder sb) {
-		StmtIterator stmtIterator = resource.listProperties();
+	private void addContactPoint(Resource resource, Property property, JSONObject jsonObject, String jsonKey) {
+		if (resource.hasProperty(property)) {
+			RDFNode rdfNode = resource.getProperty(property).getObject();
+
+			if (rdfNode.isResource()) {
+				Resource contact = rdfNode.asResource();
+				JSONObject jo = new JSONObject();
+				addLiterals(contact, VCARD4.hasEmail, jo, "email", new String[] {}, false);
+				addLiterals(contact, VCARD4.fn, jo, "name", new String[] {}, false);
+
+				if (contact.hasProperty(VCARD4.hasAddress)) {
+					RDFNode hasAddress = contact.getProperty(VCARD4.hasAddress).getObject();
+					if (hasAddress.isResource() && hasAddress.asResource().hasProperty(VCARD4.street_address)) {
+						jo.put("adress",
+								hasAddress.asResource().getProperty(VCARD4.street_address).getObject().toString());
+					}
+				}
+
+				if (contact.hasProperty(VCARD4.hasTelephone)) {
+					RDFNode hasTel = contact.getProperty(VCARD4.hasTelephone).getObject();
+					if (hasTel.isResource() && hasTel.asResource().hasProperty(VCARD4.hasValue)) {
+						jo.put("phone", hasTel.asResource().getProperty(VCARD4.hasValue).getObject().toString());
+					}
+				}
+
+				jsonObject.put(jsonKey, jo);
+			}
+		}
+	}
+
+	private void addMetrics(Resource resource, Property property, JSONObject jsonObject, String jsonKey) {
+		Map<String, String> measurements = new HashMap<>();
+		StmtIterator stmtIterator = resource.listProperties(property);
 		while (stmtIterator.hasNext()) {
 			Statement stmt = stmtIterator.next();
-			sb.append(" ");
-			sb.append(stmt.toString());
-			sb.append(System.lineSeparator());
-			if (stmt.getObject().isResource()) {
-				recursivelyAddTriples(stmt.getObject().asResource(), sb);
+			RDFNode rdfNode = stmt.getObject();
+			if (rdfNode.isResource()) {
+				Resource measurement = rdfNode.asResource();
+				String metric = null;
+				String value = null;
+				if (measurement.hasProperty(Dqv.IS_MEASUREMENT_OF)) {
+					metric = measurement.getProperty(Dqv.IS_MEASUREMENT_OF).getObject().toString();
+				}
+				if (measurement.hasProperty(Dqv.HAS_VALUE)) {
+					value = measurement.getProperty(Dqv.HAS_VALUE).getObject().asLiteral().getLexicalForm();
+				}
+				if (metric != null && value != null) {
+					measurements.put(metric, value);
+				}
+			}
+		}
+		if (!measurements.isEmpty()) {
+			JSONArray ja = new JSONArray();
+			for (Entry<String, String> entry : measurements.entrySet()) {
+				JSONObject jo = new JSONObject();
+				jo.put("isMeasurementOf", entry.getKey());
+				jo.put("value", entry.getValue());
+				ja.put(jo);
+			}
+			jsonObject.put(jsonKey, ja);
+		}
+	}
+
+	/**
+	 * Adds date, if it starts with YYYY-MM-DD.
+	 */
+	private void addDate(Resource resource, Property property, JSONObject jsonObject, String jsonKey) {
+		if (resource.hasProperty(property)) {
+			RDFNode rdfNode = resource.getProperty(property).getObject();
+			if (rdfNode.isLiteral()) {
+				String value = rdfNode.asLiteral().getValue().toString().trim();
+				Matcher matcher = DATE_PATTERN.matcher(value);
+				if (matcher.find()) {
+					jsonObject.put(jsonKey, matcher.group(1));
+				}
+			}
+		}
+	}
+
+	private void addFormat(Resource resource, Property property, JSONObject jsonObject, String jsonKey) {
+		StmtIterator stmtIterator = resource.listProperties(property);
+		while (stmtIterator.hasNext()) {
+			RDFNode rdfNode = stmtIterator.next().getObject();
+			if (rdfNode.isURIResource()) {
+				Resource format = rdfNode.asResource();
+				if (format.getURI().startsWith(Opal.NS_OPAL_FORMAT)) {
+					jsonObject.put(jsonKey, format.getURI().substring(Opal.NS_OPAL_FORMAT.length()));
+				}
+			}
+		}
+	}
+
+	private void addLicense(Resource resource, Property property, JSONObject jsonObject, String jsonKey) {
+		JSONObject jo = new JSONObject();
+		add(resource, property, jsonObject, "name", true);
+		jsonObject.put(jsonKey, jo);
+		// TODO DCTerms.license / license.name currently not used
+	}
+
+	private void addBytes(Resource resource, Property property, JSONObject jsonObject, String jsonKey) {
+		if (resource.hasProperty(property)) {
+			RDFNode rdfNode = resource.getProperty(property).getObject();
+			if (rdfNode.isLiteral()) {
+				try {
+					jsonObject.put(jsonKey, Long.parseLong(rdfNode.asLiteral().getLexicalForm()));
+				} catch (NumberFormatException e) {
+				}
 			}
 		}
 	}
 
 	/**
 	 * Adds geo data.
-	 * 
-	 * TODO
 	 */
 	private void addGeo(Resource resource, Property property, JSONObject jsonObject, String jsonKey) {
 		if (resource.hasProperty(property)) {
@@ -327,14 +398,17 @@ public class JsonExtractor implements ModelProcessor {
 						}
 					}
 				}
-
-				// StringBuilder sb = new StringBuilder();
-				// recursivelyAddTriples(rdfNode.asResource(), sb);
-				// System.err.println("B: " + rdfNode.asResource().getURI() +
-				// System.lineSeparator() + sb.toString());
-
 			}
 		}
+	}
+
+	/**
+	 * Gets a stream of triples for the resource-property-combination.
+	 */
+	private Stream<Statement> getStatementStream(Resource resource, Property property) {
+		return StreamSupport.stream(
+				Spliterators.spliteratorUnknownSize(resource.listProperties(property), SPLITERATOR_CHARACTERISTICS),
+				PARALLEL_STREAMS);
 	}
 
 }

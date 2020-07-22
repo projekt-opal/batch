@@ -61,11 +61,11 @@ public class CountDistributionsTest implements ModelProcessor {
 
 		// Create configuration which does not rewrite dataset URIs and does not create
 		// a file containing labels
-		Cfg cfg = new CfgUtils().disableDatasetUriRewriting().disableAddingLabelsFile().getCfg();
+		Cfg cfg = new CfgUtils().disableUriRewriting().disableAddingLabelsFile().getCfg();
 
 		// Disable writing of RDF data
 		if (!write) {
-			CfgUtils.disableOutputWriting(cfg);
+			CfgUtils.disableWriting(cfg);
 		}
 
 		// Set required input and output

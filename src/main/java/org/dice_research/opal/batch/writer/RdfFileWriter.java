@@ -11,7 +11,7 @@ import org.apache.jena.riot.RDFDataMgr;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class RdfFileWriter implements RdfWriter {
+public class RdfFileWriter implements Writer {
 
 	private static final Logger LOGGER = LogManager.getLogger();
 
@@ -26,7 +26,9 @@ public class RdfFileWriter implements RdfWriter {
 	private int fileCounter = 1;
 
 	@Override
-	public RdfWriter write(Model model) {
+	public void processModel(Model model, String datasetUri) throws Exception {
+
+		// TODO ignores datasetUri
 
 		if (fileOutputStream == null) {
 			file = new File(directory, title + "-" + fileCounter + "." + lang.getFileExtensions().get(0));
@@ -46,12 +48,10 @@ public class RdfFileWriter implements RdfWriter {
 		if (modelCounter == maxModels) {
 			finish();
 		}
-
-		return this;
 	}
 
 	@Override
-	public RdfWriter finish() {
+	public Writer finish() {
 		if (file != null) {
 			LOGGER.info("Wrote: " + file.getAbsolutePath() + " (" + modelCounter + " datasets)");
 			try {

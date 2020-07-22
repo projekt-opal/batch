@@ -11,6 +11,8 @@ import org.junit.runners.Suite.SuiteClasses;
 
 		CountDistributionsTest.class,
 
+		JsonExtractorTest.class,
+
 		ReadWriteTest.class,
 
 		// The following tests should be skipped by default

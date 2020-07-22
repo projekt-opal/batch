@@ -59,6 +59,20 @@
 			<version>3.6.3</version>
 		</dependency>
 
+		<!-- https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/java-rest-high-getting-started-maven.html#java-rest-high-getting-started-maven-maven -->
+		<dependency>
+			<groupId>org.elasticsearch.client</groupId>
+			<artifactId>elasticsearch-rest-high-level-client</artifactId>
+			<version>7.8.0</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.json/json -->
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20200518</version>
+		</dependency>
+
 		<!-- Logging -->
 
 		<!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
@@ -88,7 +102,7 @@
 		<dependency>
 			<groupId>org.dice-research.opal</groupId>
 			<artifactId>test-cases</artifactId>
-			<version>[1,2)</version>
+			<version>[1.2.2,2)</version>
 			<scope>test</scope>
 		</dependency>
 

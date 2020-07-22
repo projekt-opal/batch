@@ -9,9 +9,10 @@ This component reads RDF files and applies the following OPAL components:
 
 ## How to use
 
-Create a copy of the [default.properties](default.properties) file and edit the copy.
+* Download the latest [release](https://github.com/projekt-opal/batch/releases).
+* Create a copy of the [default.properties](default.properties) file and edit the copy.  
 At least, set `io.input` and `io.outputDirectory`.
-Finally, use the [Batch](src/main/java/org/dice_research/opal/batch/Batch.java) class to process the DCAT data.
+* Finally, run it by `java -jar opal-batch.jar default.properties`.
 
 
 ## Get data to process

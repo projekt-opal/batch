@@ -71,10 +71,15 @@ public class JsonExtractorTest implements ModelProcessor {
 
 		new Batch().execute(cfg, constructorManager);
 
-		Assert.assertTrue(jsonExtractor.getJson().length() > 3000);
+		String json = jsonExtractor.getJson();
+		Assert.assertTrue(json.length() > 3000);
+
+		// License URL
+		Assert.assertTrue(json.contains("http://dcat-ap.de/def/licenses/other-closed"));
 
 		if (Boolean.FALSE) {
 			model.write(System.out, "TTL");
+			System.out.println("---");
 			System.out.println(jsonExtractor.getJson(2));
 		}
 

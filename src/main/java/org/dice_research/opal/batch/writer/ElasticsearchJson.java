@@ -346,7 +346,7 @@ public class ElasticsearchJson implements ModelProcessor {
 
 	private void addLicense(Resource resource, Property property, JSONObject jsonObject, String jsonKey) {
 		JSONObject jo = new JSONObject();
-		add(resource, property, jsonObject, "name", true);
+		add(resource, property, jo, "uri", false);
 		jsonObject.put(jsonKey, jo);
 		// TODO DCTerms.license / license.name currently not used
 	}

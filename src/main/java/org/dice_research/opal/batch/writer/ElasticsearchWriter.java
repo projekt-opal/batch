@@ -27,6 +27,9 @@ public class ElasticsearchWriter implements Writer {
 	@Override
 	public void processModel(Model model, String datasetUri) throws Exception {
 
+		// Add themes of distributions to dataset. Remove unknown themes.
+		new ElasticsearchThemes().cleanThemes(model, model.getResource(datasetUri));
+		
 		if (restHighLevelClient == null) {
 			if (hostname == null) {
 				throw new RuntimeException("No hostname specified");

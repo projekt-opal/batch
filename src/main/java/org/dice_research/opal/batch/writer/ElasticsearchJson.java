@@ -106,7 +106,7 @@ public class ElasticsearchJson implements ModelProcessor {
 
 		addLiterals(dataset, DCAT.keyword, jsonObject, "keywords", new String[] { "", "en" }, true);
 		addLiterals(dataset, DCAT.keyword, jsonObject, "keywords_de", new String[] { "", "en" }, true);
-		addLiterals(dataset, DCAT.theme, jsonObject, "themes", null, true);
+		addThemes(dataset, DCAT.theme, jsonObject, "themes");
 		add(dataset, Opal.PROP_ORIGINAL_URI, jsonObject, "originalUrls", true);
 
 		// --- ES objects
@@ -398,6 +398,20 @@ public class ElasticsearchJson implements ModelProcessor {
 						}
 					}
 				}
+			}
+		}
+	}
+
+	private void addThemes(Resource resource, Property property, JSONObject jsonObject, String jsonKey) {
+		StmtIterator stmtIterator = resource.listProperties(property);
+		while (stmtIterator.hasNext()) {
+			RDFNode rdfNode = stmtIterator.next().getObject();
+
+			if (rdfNode.isURIResource()) {
+				jsonObject.append(jsonKey, rdfNode.asResource().getURI());
+
+			} else if (rdfNode.isLiteral()) {
+				jsonObject.append(jsonKey, rdfNode.asLiteral().getLexicalForm());
 			}
 		}
 	}

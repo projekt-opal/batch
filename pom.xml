@@ -27,7 +27,7 @@
 		<dependency>
 			<groupId>org.dice-research.opal</groupId>
 			<artifactId>metadata-refinement</artifactId>
-			<version>[1.0.7,2)</version>
+			<version>[1.0.8,2)</version>
 		</dependency>
 
 		<!-- https://github.com/projekt-opal/civet -->

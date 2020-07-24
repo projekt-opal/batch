@@ -6,60 +6,82 @@ import org.apache.http.HttpHost;
 import org.apache.jena.rdf.model.Model;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
 
+/**
+ * Elasticsearch writer.
+ * 
+ * @see https://www.elastic.co/guide/en/elasticsearch/client/java-rest/7.3/java-rest-high.html
+ *
+ * @author Adrian Wilke
+ */
 public class ElasticsearchWriter implements Writer {
 
 	private static final Logger LOGGER = LogManager.getLogger();
-
-	private RestHighLevelClient restHighLevelClient;
 
 	public String hostname;
 	public int port = -1;
 	public String scheme;
 	public String index;
+	public int maxModels = -1;
+
+	private BulkRequest bulkRequest;
+	private int modelCounter = 0;
 
 	@Override
 	public void processModel(Model model, String datasetUri) throws Exception {
 
+		if (hostname == null) {
+			throw new RuntimeException("No hostname specified");
+		} else if (port == -1) {
+			throw new RuntimeException("No port specified");
+		} else if (scheme == null) {
+			throw new RuntimeException("No scheme specified");
+		} else if (index == null) {
+			throw new RuntimeException("No index specified");
+		} else if (maxModels == -1) {
+			throw new RuntimeException("No maxModels specified");
+		}
+
 		// Add themes of distributions to dataset. Remove unknown themes.
 		new ElasticsearchThemes().cleanThemes(model, model.getResource(datasetUri));
-		
-		if (restHighLevelClient == null) {
-			if (hostname == null) {
-				throw new RuntimeException("No hostname specified");
-			} else if (port == -1) {
-				throw new RuntimeException("No hostname specified");
-			} else if (scheme == null) {
-				throw new RuntimeException("No scheme specified");
-			} else if (index == null) {
-				throw new RuntimeException("No index specified");
-			}
-			this.restHighLevelClient = new RestHighLevelClient(
-					RestClient.builder(new HttpHost(hostname, port, scheme)));
+
+		if (bulkRequest == null) {
+			bulkRequest = new BulkRequest();
 		}
 
 		ElasticsearchJson json = new ElasticsearchJson();
 		json.processModel(model, datasetUri);
+		bulkRequest.add(new IndexRequest(index).source(json.getJson(), XContentType.JSON));
 
-		IndexRequest indexRequest = new IndexRequest(index).source(json.getJson(), XContentType.JSON);
-		IndexResponse indexResponse = restHighLevelClient.index(indexRequest, RequestOptions.DEFAULT);
-
-		LOGGER.debug(indexResponse);
+		modelCounter++;
+		if (modelCounter == maxModels) {
+			finish();
+		}
 	}
 
 	@Override
 	public Writer finish() {
-		try {
-			this.restHighLevelClient.close();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+
+		if (bulkRequest != null) {
+			try (RestHighLevelClient restHighLevelClient = new RestHighLevelClient(
+					RestClient.builder(new HttpHost(hostname, port, scheme)))) {
+				BulkResponse bulkResponse = restHighLevelClient.bulk(bulkRequest, RequestOptions.DEFAULT);
+				LOGGER.info(bulkResponse.getItems().length + " items, " + bulkResponse.getTook().toString());
+			} catch (IOException e) {
+				LOGGER.error(e);
+			}
 		}
+
+		bulkRequest = null;
+		modelCounter = 0;
+
 		return this;
 	}
 

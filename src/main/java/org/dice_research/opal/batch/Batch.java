@@ -256,6 +256,9 @@ public class Batch {
 			elasticsearchWriter.processModel(result.getModel(), result.getDatasetUri());
 			outputInfo.writtenModels++;
 			outputInfo.writtenTriples += result.getModel().size();
+			if (outputInfo.writtenModels % 10000 == 0) {
+				LOGGER.info("Processed datasets: " + outputInfo.writtenModels);
+			}
 		}
 	}
 
@@ -317,6 +320,7 @@ public class Batch {
 			writer.port = cfg.getInt(CfgKeys.IO_ELASTICSEARCH_PORT);
 			writer.scheme = cfg.get(CfgKeys.IO_ELASTICSEARCH_SCHEME);
 			writer.index = cfg.get(CfgKeys.IO_ELASTICSEARCH_INDEX);
+			writer.maxModels = outputSize;
 			elasticsearchWriter = writer;
 		} else {
 			elasticsearchWriter = new DummyWriter();

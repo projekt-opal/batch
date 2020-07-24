@@ -1,5 +1,6 @@
 package org.dice_research.opal.batch.writer;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -145,7 +146,7 @@ public class ElasticsearchJson implements ModelProcessor {
 
 		jsonObject.put("uri", distribution.getURI());
 		add(distribution, DCTerms.title, jsonObject, "title", false);
-		add(distribution, DCTerms.description, jsonObject, "description", false);
+		addDescription(distribution, DCTerms.description, jsonObject, "description");
 		addDate(distribution, DCTerms.issued, jsonObject, "issued");
 		addDate(distribution, DCTerms.modified, jsonObject, "modified");
 		add(distribution, DCAT.accessURL, jsonObject, "accessUrl", false);
@@ -412,6 +413,24 @@ public class ElasticsearchJson implements ModelProcessor {
 
 			} else if (rdfNode.isLiteral()) {
 				jsonObject.append(jsonKey, rdfNode.asLiteral().getLexicalForm());
+			}
+		}
+	}
+
+	private void addDescription(Resource resource, Property property, JSONObject jsonObject, String jsonKey) {
+		if (resource.hasProperty(property)) {
+			RDFNode rdfNode = resource.getProperty(property).getObject();
+			if (rdfNode.isLiteral()) {
+				String value = rdfNode.asLiteral().getValue().toString().trim();
+
+				if (value.getBytes(StandardCharsets.UTF_8).length > 32766) {
+					// Could theoretically be more, but mostly it is 2 bytes / char
+					value = value.substring(0, 32766 / 4);
+				}
+
+				if (value != null && !value.isEmpty()) {
+					jsonObject.put(jsonKey, value);
+				}
 			}
 		}
 	}

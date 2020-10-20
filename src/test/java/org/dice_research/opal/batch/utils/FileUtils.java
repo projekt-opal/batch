@@ -26,7 +26,8 @@ public abstract class FileUtils {
 
 	public static File createtmpDirectory(Class<?> classObject) {
 		try {
-			return Files.createTempDirectory(classObject.getPackageName() + "." + classObject.getName() + ".").toFile();
+			return Files.createTempDirectory(classObject.getPackage().getName() + "." + classObject.getName() + ".")
+					.toFile();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -41,7 +42,8 @@ public abstract class FileUtils {
 
 	public static File createTmpModelFile(Model model, Class<?> classObject, boolean deleteOnExit) {
 		try {
-			File file = File.createTempFile(classObject.getPackageName() + "." + classObject.getName() + ".", ".ttl");
+			File file = File.createTempFile(classObject.getPackage().getName() + "." + classObject.getName() + ".",
+					".ttl");
 			if (deleteOnExit) {
 				file.deleteOnExit();
 			}

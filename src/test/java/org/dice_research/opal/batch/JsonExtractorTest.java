@@ -1,6 +1,7 @@
 package org.dice_research.opal.batch;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.jena.rdf.model.Model;
 import org.dice_research.opal.batch.configuration.Cfg;
@@ -45,7 +46,9 @@ public class JsonExtractorTest implements ModelProcessor {
 
 		Assert.assertTrue(jsonExtractor.getJson().length() > 3000);
 
+		// Dev: Print input and output
 		if (Boolean.FALSE) {
+			System.out.println(org.apache.commons.io.FileUtils.readFileToString(input, StandardCharsets.UTF_8));
 			System.out.println(jsonExtractor.getJson(2));
 		}
 

@@ -102,6 +102,7 @@ public class ElasticsearchJson implements ModelProcessor {
 		add(dataset, DCAT.landingPage, jsonObject, "landingPage", false);
 		add(dataset, DCTerms.accrualPeriodicity, jsonObject, "accrualPeriodicity", false);
 		add(dataset, DCTerms.identifier, jsonObject, "dcatIdentifier", false);
+		add(dataset, DCAT.catalog, jsonObject, "catalog", false);
 
 		// --- ES String lists
 

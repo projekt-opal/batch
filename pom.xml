@@ -6,7 +6,7 @@
 	<name>OPAL batch</name>
 	<groupId>org.dice-research.opal</groupId>
 	<artifactId>batch</artifactId>
-	<version>1.0.4-SNAPSHOT</version>
+	<version>1.0.4</version>
 
 	<properties>
 		<java.version>1.8</java.version>
@@ -27,7 +27,7 @@
 		<dependency>
 			<groupId>org.dice-research.opal</groupId>
 			<artifactId>metadata-refinement</artifactId>
-			<version>[1.0.8,2)</version>
+			<version>[1.0.11,2)</version>
 		</dependency>
 
 		<!-- https://github.com/projekt-opal/civet -->
